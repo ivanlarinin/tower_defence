@@ -27,6 +27,10 @@ public class Turret : MonoBehaviour
         {
             m_RefireTimer -= Time.deltaTime;
         }
+        else if (Mode == TurretMode.Auto)
+        {
+            Fire(); // Auto turrets try to fire as soon as they can
+        }
     }
 
     /// <summary>
