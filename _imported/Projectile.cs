@@ -27,10 +27,10 @@ public class Projectile : ProjectileBase
 
     protected override void OnProjectileLifeEnd(Collider2D col, Vector2 pos)
     {
-        if (m_ImpactEffectPrefab != null)
-        {
-            Instantiate(m_ImpactEffectPrefab, pos, Quaternion.identity);
-        }
+        // if (m_ImpactEffectPrefab != null)
+        // {
+        //     Instantiate(m_ImpactEffectPrefab, pos, Quaternion.identity);
+        // }
 
         Destroy(gameObject, 0);
     }

@@ -114,10 +114,10 @@ public class Destructable : Entity
     protected virtual void OnDeath()
     {
         // Spawn explosion VFX at the current transform position
-        if (m_ExplosionPrefab != null)
-        {
-            Instantiate(m_ExplosionPrefab, transform.position, Quaternion.identity);
-        }
+        // if (m_ExplosionPrefab != null)
+        // {
+        //     Instantiate(m_ExplosionPrefab, transform.position, Quaternion.identity);
+        // }
 
         // Destroy this object and fire the death event
         Destroy(gameObject);
