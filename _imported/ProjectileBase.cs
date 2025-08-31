@@ -36,16 +36,15 @@ public abstract class ProjectileBase : Entity
 
             Destructable dest = hit.collider.GetComponentInParent<Destructable>();
 
-            if (dest != null && dest != m_Parent)
+            if (dest != null)
             {
-                // Debug.Log($"Projectile dmg={m_Damage}");
+                Debug.Log($"Projectile hit destructible: {dest.name}");
+
                 dest.ApplyDamage(m_Damage);
+                // OnHit(dest);
 
-
-                OnHit(dest);
+                OnProjectileLifeEnd(hit.collider, hit.point);
             }
-
-            OnProjectileLifeEnd(hit.collider, hit.point);
         }
 
         m_Timer += Time.deltaTime;

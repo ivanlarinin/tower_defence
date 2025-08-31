@@ -6,16 +6,13 @@ public class SpaceShip : Destructable
     [SerializeField] private Sprite m_PreviewImage; // Sprite used for UI previews of this ship
 
     [Header("Space Ship")]
-    [SerializeField] private float m_Mass;               // Rigidbody mass
-    [SerializeField] private float m_Thrust;             // Forward thrust force
-    [SerializeField] private float m_Mobility;           // Turning/maneuverability factor
-    [SerializeField] private float m_MaxLinearVelocity;  // Maximum forward/backward speed
-    [SerializeField] private float m_MaxAngularVelocity; // Maximum rotational speed (degrees/sec)
+    [SerializeField] private float m_Mass;
+    [SerializeField] private float m_AngularDampK = 0.1f;
+    private Rigidbody2D m_Rigid;
 
-    private Rigidbody2D m_Rigid; // Cached Rigidbody2D reference
-
-    public float MaxLinearVelocity => m_MaxLinearVelocity;
-    public float MaxAngularVelocity => m_MaxAngularVelocity;
+    [Header("Forces")]
+    [SerializeField] private float m_MaxThrust = 10f;
+    [SerializeField] private float m_MaxTorque = 15f;
     public Sprite PreviewImage => m_PreviewImage;
 
     #region Public API
@@ -53,28 +50,13 @@ public class SpaceShip : Destructable
 
     private void FixedUpdate()
     {
-        UpdateRigidBody();    // Apply thrust/rotation forces
-        // UpdateEnergyRegen();  // Regenerate primary energy over time
+        m_Rigid.AddForce(transform.up * (ThrustControl * m_MaxThrust), ForceMode2D.Force);
+
+        float torqueCmd = TorqueControl * m_MaxTorque;
+        torqueCmd += -m_Rigid.angularVelocity * m_AngularDampK;
+        m_Rigid.AddTorque(torqueCmd, ForceMode2D.Force);
     }
     #endregion
-
-    /// <summary>
-    /// Applies movement and rotation forces based on player/AI control values.
-    /// </summary>
-    private void UpdateRigidBody()
-    {
-        // Forward/backward thrust
-        m_Rigid.AddForce(ThrustControl * m_Thrust * transform.up * Time.fixedDeltaTime, ForceMode2D.Force);
-
-        // Linear drag proportional to current velocity and mobility
-        m_Rigid.AddForce(-m_Rigid.linearVelocity * (m_Mobility / m_MaxLinearVelocity) * Time.fixedDeltaTime, ForceMode2D.Force);
-
-        // Rotational thrust
-        m_Rigid.AddTorque(TorqueControl * m_Mobility * Time.fixedDeltaTime, ForceMode2D.Force);
-
-        // Rotational drag proportional to current angular velocity and mobility
-        m_Rigid.AddTorque(-m_Rigid.angularVelocity * (m_Mobility / m_MaxAngularVelocity) * Time.fixedDeltaTime, ForceMode2D.Force);
-    }
 
     /// <summary>
     /// TODO: Change the method to the actual one
