@@ -15,6 +15,8 @@ namespace TowerDefence
         [SerializeField] private SpriteRenderer m_spriteRenderer;
         [SerializeField] private Animator m_animator;
         [SerializeField] private CircleCollider2D m_circleCollider;
+        [SerializeField] private Transform m_Scale;
+
 
         private AIController m_aiController;
         private CharacterMotor2D m_characterMotor;
@@ -38,17 +40,15 @@ namespace TowerDefence
 
             if (!m_aiController) TryGetComponent(out m_aiController);
             if (!m_characterMotor) TryGetComponent(out m_characterMotor);
+
+            if (!m_Scale && m_spriteRenderer)
+                m_Scale = m_spriteRenderer.transform;
+
         }
 
 
         public void Use(EnemyAsset asset)
         {
-            if (!asset)
-            {
-                Debug.LogWarning($"{name}: EnemyAsset is null.");
-                return;
-            }
-
             CacheRefs();
 
             if (m_spriteRenderer) m_spriteRenderer.color = asset.color;
@@ -64,6 +64,13 @@ namespace TowerDefence
 
             if (m_circleCollider)
                 m_circleCollider.radius = asset.Radius;
+
+            if (m_Scale)
+            {
+                float scale = asset.Radius * 2f;
+                m_Scale.localScale = new Vector3(scale, scale, 1f);
+            }
+
         }
     }
 
