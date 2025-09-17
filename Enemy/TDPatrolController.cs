@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace TowerDefence
 {
@@ -10,6 +11,7 @@ namespace TowerDefence
         public void SetPath(Path path) => m_Path = path;
 
         private AIController m_AI;
+        [SerializeField] private UnityEvent m_OnArrive;
         private int m_Index = -1;
 
         private void Awake()
@@ -23,6 +25,7 @@ namespace TowerDefence
             {
                 Debug.LogWarning($"[{name}] No path/points, destroying.");
                 Destroy(gameObject);
+                m_OnArrive?.Invoke();
                 return;
             }
 

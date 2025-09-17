@@ -16,6 +16,7 @@ namespace TowerDefence
         [SerializeField] private Animator m_animator;
         [SerializeField] private CircleCollider2D m_circleCollider;
         [SerializeField] private Transform m_Scale;
+        [SerializeField] private int m_damage = 1;
 
 
         private AIController m_aiController;
@@ -71,7 +72,12 @@ namespace TowerDefence
                 m_Scale.localScale = new Vector3(scale, scale, 1f);
             }
 
+            m_damage = asset.damage;
         }
+
+        public void DamagePlayer()
+        {
+            Player.Instance.TakeDamage(m_damage);       }
     }
 
     [CustomEditor(typeof(Enemy))]
