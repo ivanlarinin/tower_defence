@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 /// <summary>
@@ -93,4 +94,12 @@ public class Player : SingletonBase<Player>
         m_Score += num;
     }
 
+    internal void TakeDamage(int m_damage)
+    {
+        m_NumLives -= m_damage;
+        if (m_NumLives <= 0)
+        {
+            m_NumLives = 0;
+        }     
+    }
 }
