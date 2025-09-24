@@ -17,14 +17,15 @@ namespace TowerDefence
         [SerializeField] private CircleCollider2D m_circleCollider;
         [SerializeField] private Transform m_Scale;
         [SerializeField] private int m_damage = 1;
-
-
+        [SerializeField] private int m_gold = 1;
         private AIController m_aiController;
         private CharacterMotor2D m_characterMotor;
 
         private void Awake()
         {
             CacheRefs();
+            if (m_characterMotor != null)
+                m_characterMotor.EventOnDeath.AddListener(GiveGold);
         }
 
         private void OnValidate()
@@ -32,6 +33,7 @@ namespace TowerDefence
             if (Application.isPlaying) return;
             CacheRefs();
         }
+
 
         private void CacheRefs()
         {
@@ -44,7 +46,6 @@ namespace TowerDefence
 
             if (!m_Scale && m_spriteRenderer)
                 m_Scale = m_spriteRenderer.transform;
-
         }
 
 
@@ -73,11 +74,24 @@ namespace TowerDefence
             }
 
             m_damage = asset.damage;
+            m_gold = asset.gold;
+
+            // m_characterMotor.EventOnDeath.AddListener(GiveGold);
         }
 
         public void DamagePlayer()
         {
-            Player.Instance.TakeDamage(m_damage);       }
+            // TODO: Damage the player with m_damage
+        }
+
+        public void GiveGold()
+        {
+            TDPlayer player = FindFirstObjectByType<TDPlayer>();
+            if (player != null)
+            {
+                player.ChangeGold(m_gold);
+            }
+        }
     }
 
     [CustomEditor(typeof(Enemy))]
