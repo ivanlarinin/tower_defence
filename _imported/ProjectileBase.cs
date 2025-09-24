@@ -32,17 +32,15 @@ public abstract class ProjectileBase : Entity
 
         if (hit)
         {
-            OnCollide2D(hit.collider);
+            // OnCollide2D(hit.collider);
 
             Destructable dest = hit.collider.GetComponentInParent<Destructable>();
 
             if (dest != null)
             {
-                Debug.Log($"Projectile hit destructible: {dest.name}");
+                // Debug.Log($"Projectile hit destructible: {dest.name}");
 
                 dest.ApplyDamage(m_Damage);
-                // OnHit(dest);
-
                 OnProjectileLifeEnd(hit.collider, hit.point);
             }
         }

@@ -1,4 +1,5 @@
 using System;
+using TowerDefence;
 using UnityEngine;
 
 /// <summary>
@@ -10,6 +11,8 @@ public class Player : SingletonBase<Player>
     public static SpaceShip SelectedSpaceShip;
 
     [SerializeField] private int m_NumLives;
+    public int NumLives { get { return m_NumLives; } }
+
     [SerializeField] private SpaceShip m_PlayerShipPrefab;
 
     // [SerializeField] private StarfieldParallaxController m_ParallaxController;
@@ -35,7 +38,6 @@ public class Player : SingletonBase<Player>
 
     public int Score => m_Score;
     public int NumKills => m_NumKills;
-    public int NumLives => m_NumLives;
 
     public SpaceShip ShipPrefab
     {
@@ -54,7 +56,7 @@ public class Player : SingletonBase<Player>
 
     private void Start()
     {
-        Respawn();
+        // Respawn();
     }
 
     private void OnShipDeath()
@@ -94,7 +96,7 @@ public class Player : SingletonBase<Player>
         m_Score += num;
     }
 
-    internal void TakeDamage(int m_damage)
+    protected void TakeDamage(int m_damage)
     {
         m_NumLives -= m_damage;
         if (m_NumLives <= 0)
