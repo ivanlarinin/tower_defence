@@ -2,7 +2,7 @@ using TowerDefence;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace TowerDefense
+namespace TowerDefence
 {
     public class TowerBuyControl : MonoBehaviour
     {
@@ -10,13 +10,17 @@ namespace TowerDefense
         [SerializeField] private Text m_text;
         [SerializeField] private Button m_button;
         [SerializeField] private Transform buildSite;
-        public Transform BuildSite { set { BuildSite = value; } }
+        public void SetBuildSite(Transform value)
+        {
+            buildSite = value;
+        }
 
         private void Awake()
         {
             TDPlayer.GoldUpdateSubscribe(GoldStatusCheck);
             m_text.text = m_ta.goldCost.ToString();
             m_button.GetComponent<Image>().sprite = m_ta.GUIsprite;
+            GoldStatusCheck(0);
         }
 
         private void GoldStatusCheck(int gold)
@@ -27,10 +31,11 @@ namespace TowerDefense
                 m_text.color = m_button.interactable ? Color.white : Color.red;
             }
         }
-        
+
         public void BuyTower()
         {
-            // TDPlayer.Instance.TryBuild(m_ta, buildSite);
+            TDPlayer.Instance.TryBuild(m_ta, buildSite);
+            BuildSite.HideControls();
         }
     }
 }

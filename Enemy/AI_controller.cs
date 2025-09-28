@@ -5,7 +5,7 @@ namespace TowerDefence
     /// <summary>
     /// AI controller that moves towards a target position
     /// </summary>
-    [RequireComponent(typeof(CharacterMotor2D))]
+    [RequireComponent(typeof(CharacterMotor))]
     public class AIController : MonoBehaviour
     {
         [Header("Nav")]
@@ -18,7 +18,7 @@ namespace TowerDefence
             set => m_Speed = value;
         }
 
-        CharacterMotor2D motor;
+        CharacterMotor motor;
         Vector3 m_MovePosition;
         bool m_HasTarget;
 
@@ -26,7 +26,7 @@ namespace TowerDefence
         public void SetMoveTarget(Vector3 worldPos) { m_MovePosition = worldPos; m_HasTarget = true; }
         public bool ReachedTarget() => !m_HasTarget || Vector3.Distance(transform.position, m_MovePosition) <= m_ArrivalDistance;
 
-        void Awake() => motor = GetComponent<CharacterMotor2D>();
+        void Awake() => motor = GetComponent<CharacterMotor>();
 
         void FixedUpdate()
         {

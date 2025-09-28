@@ -8,12 +8,11 @@ namespace TowerDefence
     [RequireComponent(typeof(Player))]
     public class TDPlayer : Player
     {
-        public static new TDPlayer Instance
+        public static new TDPlayer Instance { get; private set; }
+
+        private void Awake()
         {
-            get
-            {
-                return Player.Instance as TDPlayer;
-            }
+            Instance = this;
         }
 
         private static event System.Action<int> OnGoldChanged;
@@ -50,9 +49,11 @@ namespace TowerDefence
 
         public void TryBuild(TowerAssets towerAsset, Transform buildSite)
         {
+            if (m_gold < towerAsset.goldCost) return;
             ChangeGold(-towerAsset.goldCost);
             var tower = Instantiate(m_towerPrefab, buildSite.position, Quaternion.identity);
             tower.GetComponentInChildren <SpriteRenderer>().sprite = towerAsset.sprite;
+            tower.GetComponentInChildren<Turret>().SetTurretProperties(towerAsset.turretProperties);
             Destroy(buildSite.gameObject);
         }
     }

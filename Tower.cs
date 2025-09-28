@@ -39,7 +39,6 @@ namespace TowerDefence
 
             if (m_Target != null)
             {
-                // Debug.Log("Firing at target: " + m_Target.name);
                 Vector2 targetVector = m_Target.transform.position - transform.position;
                 float active_dist = targetVector.magnitude;
 

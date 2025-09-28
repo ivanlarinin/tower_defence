@@ -8,14 +8,14 @@ namespace TowerDefence
     {
         public static event Action<Transform> OnClickEvent;
 
-        protected void InvokeNullEvent()
+        public static void HideControls()
         {
             OnClickEvent?.Invoke(null);
         }
         
         public virtual void OnPointerDown(PointerEventData eventData)
         {
-            OnClickEvent?.Invoke(transform.root);
+            OnClickEvent?.Invoke(transform.root); 
         }
     }
 }

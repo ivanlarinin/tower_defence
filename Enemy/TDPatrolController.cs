@@ -47,7 +47,16 @@ namespace TowerDefence
             m_Index++;
 
             if (m_Path == null || m_Index >= m_Path.Count)
+            {
+                m_OnArrive?.Invoke();
+
+                if (TDPlayer.Instance != null)
+                {
+                    TDPlayer.Instance.ReduceLife(1);
+                }
                 Destroy(gameObject);
+                return;
+            }
 
             m_AI.SetMoveTarget(m_Path.GetPosition(m_Index));
         }

@@ -20,6 +20,9 @@ public sealed class TurretProperties : ScriptableObject
     [SerializeField] private Projectile m_ProjectilePrefab;
     public Projectile ProjectilePrefab => m_ProjectilePrefab;
 
+    [SerializeField] private Sprite m_ProjectileSprite;
+    public Sprite ProjectileSprite => m_ProjectileSprite;
+
     [SerializeField] private float m_RateOfFire;
     public float RateOfFire => m_RateOfFire;
 

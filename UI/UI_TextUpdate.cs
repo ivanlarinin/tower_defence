@@ -20,10 +20,10 @@ namespace TowerDefence
             switch (source)
             {
                 case UpdateSource.PlayerLifes:
-                    TDPlayer.GoldUpdateSubscribe(UpdateText);
+                    TDPlayer.LivesUpdateSubscribe(UpdateText);
                     break;
                 case UpdateSource.PlayerMoney:
-                    TDPlayer.LivesUpdateSubscribe(UpdateText);
+                    TDPlayer.GoldUpdateSubscribe(UpdateText);
                     break;
                 default:
                     break;

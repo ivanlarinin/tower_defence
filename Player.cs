@@ -1,107 +1,140 @@
-using System;
-using TowerDefence;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
-/// <summary>
-/// Singleton that manages the player's state, including their active ship, lives, score, and kills.
-/// Handles spawning, respawning, and linking the ship to camera/input controllers.
-/// </summary>
-public class Player : SingletonBase<Player>
+namespace TowerDefence
 {
-    public static SpaceShip SelectedSpaceShip;
-
-    [SerializeField] private int m_NumLives;
-    public int NumLives { get { return m_NumLives; } }
-
-    [SerializeField] private SpaceShip m_PlayerShipPrefab;
-
-    // [SerializeField] private StarfieldParallaxController m_ParallaxController;
-
-    private FollowCamera m_FollowCamera;
-    // private ShipInputController m_ShipInputController;
-    private Transform m_SpawnPoint;
-
-    public FollowCamera FollowCamera => m_FollowCamera;
-
-    // public void Construct(FollowCamera followCamera, ShipInputController shipInputController, Transform spawnPoint)
-    // {
-    //     m_FollowCamera = followCamera;
-    //     m_ShipInputController = shipInputController;
-    //     m_SpawnPoint = spawnPoint;
-    // }
-
-    private SpaceShip m_Ship;
-    public SpaceShip ActiveShip => m_Ship;
-
-    private int m_Score;
-    private int m_NumKills;
-
-    public int Score => m_Score;
-    public int NumKills => m_NumKills;
-
-    public SpaceShip ShipPrefab
+    public class Player : SingletonBase<Player>
     {
-        get
-        {
-            if (SelectedSpaceShip == null)
-            {
-                return m_PlayerShipPrefab;
-            }
-            else
-            {
-                return SelectedSpaceShip;
-            }
-        }
-    }
+        public static SpaceShip SelectedSpaceShip;
 
-    private void Start()
-    {
-        // Respawn();
-    }
+        [SerializeField] private int m_NumLives;
+        public int NumLives { get { return m_NumLives; } }
 
-    private void OnShipDeath()
-    {
-        m_NumLives--;
+        [SerializeField] private SpaceShip m_PlayerShipPrefab;
 
-        if (m_NumLives > 0)
-        {
-            Respawn();
-        }
-    }
+        // [SerializeField] private StarfieldParallaxController m_ParallaxController;
 
-    private void Respawn()
-    {
-        var newPlayerShip = Instantiate(ShipPrefab, m_SpawnPoint.position, m_SpawnPoint.rotation);
+        private FollowCamera m_FollowCamera;
+        // private ShipInputController m_ShipInputController;
+        private Transform m_SpawnPoint;
 
-        m_Ship = newPlayerShip.GetComponent<SpaceShip>();
+        public FollowCamera FollowCamera => m_FollowCamera;
 
-        m_FollowCamera.SetTarget(m_Ship.transform);
-        // m_ShipInputController.SetTargetShip(m_Ship);
-
-        m_Ship.EventOnDeath.AddListener(OnShipDeath);
-
-        // if (m_ParallaxController != null)
+        // public void Construct(FollowCamera followCamera, ShipInputController shipInputController, Transform spawnPoint)
         // {
-        //     m_ParallaxController.target = m_Ship.transform;
+        //     m_FollowCamera = followCamera;
+        //     m_ShipInputController = shipInputController;
+        //     m_SpawnPoint = spawnPoint;
         // }
-    }
 
-    public void AddKill()
-    {
-        m_NumKills += 1;
-    }
+        private SpaceShip m_Ship;
+        public SpaceShip ActiveShip => m_Ship;
 
-    public void AddScore(int num)
-    {
-        m_Score += num;
-    }
+        private int m_Score;
+        private int m_NumKills;
 
-    protected void TakeDamage(int m_damage)
-    {
-        m_NumLives -= m_damage;
-        if (m_NumLives <= 0)
+        public int Score => m_Score;
+        public int NumKills => m_NumKills;
+
+        public SpaceShip ShipPrefab
         {
-            m_NumLives = 0;
-        }     
+            get
+            {
+                if (SelectedSpaceShip == null)
+                {
+                    return m_PlayerShipPrefab;
+                }
+                else
+                {
+                    return SelectedSpaceShip;
+                }
+            }
+        }
+
+        private void Start()
+        {
+            // Respawn();
+        }
+
+        private void Update()
+        {
+            CheckForRemainingEnemies();
+        }
+
+        private void CheckForRemainingEnemies()
+        {
+            // Find ALL active instances of the Enemy class in the scene.
+            // Replace 'EnemyScript' with the actual class name on your enemies.
+            // If the Enemy script is not in the TowerDefence namespace, you may need
+            // to adjust access or its namespace.
+            // Assuming the enemy script is called 'Enemy' for this example.
+
+            // NOTE: If your enemy script is not in the same namespace,
+            // you may need to specify its full path or add a 'using' statement.
+            var remainingEnemies = FindObjectsByType<Enemy>(
+                FindObjectsInactive.Exclude,
+                FindObjectsSortMode.None
+                );
+
+            if (remainingEnemies.Length == 0)
+            {
+                SceneManager.LoadScene(1);
+            }
+        }
+
+        private void OnShipDeath()
+        {
+            m_NumLives--;
+
+            if (m_NumLives > 0)
+            {
+                Respawn();
+            }
+        }
+
+        private void Respawn()
+        {
+            var newPlayerShip = Instantiate(ShipPrefab, m_SpawnPoint.position, m_SpawnPoint.rotation);
+
+            m_Ship = newPlayerShip.GetComponent<SpaceShip>();
+
+            m_FollowCamera.SetTarget(m_Ship.transform);
+            // m_ShipInputController.SetTargetShip(m_Ship);
+
+            m_Ship.EventOnDeath.AddListener(OnShipDeath);
+
+            // if (m_ParallaxController != null)
+            // {
+            //     m_ParallaxController.target = m_Ship.transform;
+            // }
+        }
+
+        public void AddKill()
+        {
+            m_NumKills += 1;
+        }
+
+        public void AddScore(int num)
+        {
+            m_Score += num;
+        }
+
+        protected void TakeDamage(int m_damage)
+        {
+            m_NumLives -= m_damage;
+            if (m_NumLives <= 0)
+            {
+                SceneManager.LoadScene(0);
+
+                // if (LevelController.Instance != null)
+                // {
+                //     LevelController.Instance.RestartLevel();
+                // }
+                // else
+                // {
+                //     Debug.Log("No LevelController found");
+                // }
+            }
+        }
     }
 }

@@ -105,6 +105,13 @@ public class Destructable : Entity
         m_TeamId = teamId;
     }
 
+    public void AddHitPoints(int amount)
+    {
+        m_CurrentHitPoints += amount;
+        if (m_CurrentHitPoints > m_HitPoints)
+            m_CurrentHitPoints = m_HitPoints;
+    }
+
     [SerializeField] private UnityEvent m_EventOnDeath;
     public UnityEvent EventOnDeath => m_EventOnDeath;
 

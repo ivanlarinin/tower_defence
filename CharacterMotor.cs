@@ -6,7 +6,7 @@ namespace TowerDefence
     /// 2D character motor for top-down movement with acceleration, deceleration, and turning.
     /// </summary>
     [RequireComponent(typeof(Rigidbody2D))]
-    public class CharacterMotor2D : Destructable
+    public class CharacterMotor : Destructable
     {
         [Header("Move")]
         [SerializeField] float m_MaxSpeed = 5f;

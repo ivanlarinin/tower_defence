@@ -7,7 +7,7 @@ namespace TowerDefence
     {
         public override void OnPointerDown(PointerEventData eventData)
         {
-            InvokeNullEvent();
+            HideControls();
         }
     }
 }
