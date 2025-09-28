@@ -8,11 +8,11 @@ namespace TowerDefence
         private void Awake()
         {
             t = GetComponent<RectTransform>();
-            BuildSite.OnClickEvent += MoveToTransform;
+            BuildSite.OnClickEvent += MoveToBuildSite;
             gameObject.SetActive(false);
         }
 
-        private void MoveToTransform(Transform target)
+        private void MoveToBuildSite(Transform target)
         {
             if (target)
             {
@@ -31,6 +31,11 @@ namespace TowerDefence
             {
                 gameObject.SetActive(false);
             }
+            
+            foreach (var tbc in GetComponentsInChildren<TowerBuyControl>())
+            {
+                tbc.SetBuildSite(target);
+            } 
         }
     }
 }

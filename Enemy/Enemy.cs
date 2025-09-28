@@ -9,7 +9,7 @@ namespace TowerDefence
     [DisallowMultipleComponent]
     [SelectionBase]
     [RequireComponent(typeof(AIController))]
-    [RequireComponent(typeof(CharacterMotor2D))]
+    [RequireComponent(typeof(CharacterMotor))]
     public class Enemy : MonoBehaviour
     {
         [SerializeField] private SpriteRenderer m_spriteRenderer;
@@ -19,7 +19,14 @@ namespace TowerDefence
         [SerializeField] private int m_damage = 1;
         [SerializeField] private int m_gold = 1;
         private AIController m_aiController;
-        private CharacterMotor2D m_characterMotor;
+        private CharacterMotor m_characterMotor;
+
+        // Buff related
+        [SerializeField] private GameObject m_buffFX;
+        [SerializeField] private float m_buffRadius = 2f;
+        [SerializeField] private float buffCooldown = 4f;
+        private float lastBuffTime = -Mathf.Infinity;
+        private int buff = 0;
 
         private void Awake()
         {
@@ -34,6 +41,36 @@ namespace TowerDefence
             CacheRefs();
         }
 
+        private void Update()
+        {
+            if (buff == 1)
+                TryBuffNearbyEnemy();
+        }
+
+        private void TryBuffNearbyEnemy()
+        {
+            if (Time.time - lastBuffTime < buffCooldown)
+                return;
+
+            lastBuffTime = Time.time;
+
+            Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, m_buffRadius);
+            foreach (var hit in hits)
+            {
+                if (hit.gameObject == this.gameObject) continue;
+
+                CharacterMotor other = hit.GetComponentInParent<CharacterMotor>();
+                if (other != null)
+                {
+                    other.AddHitPoints(10);
+                    if (m_buffFX != null)
+                    {
+                        Debug.Log($"Buffed {other.name}");
+                        Instantiate(m_buffFX, other.transform.position, Quaternion.identity);
+                    }
+                }
+            }
+        }
 
         private void CacheRefs()
         {
@@ -47,7 +84,6 @@ namespace TowerDefence
             if (!m_Scale && m_spriteRenderer)
                 m_Scale = m_spriteRenderer.transform;
         }
-
 
         public void Use(EnemyAsset asset)
         {
@@ -69,14 +105,13 @@ namespace TowerDefence
 
             if (m_Scale)
             {
-                float scale = asset.Radius * 2f;
+                float scale = asset.Radius * 4f;
                 m_Scale.localScale = new Vector3(scale, scale, 1f);
             }
 
             m_damage = asset.damage;
             m_gold = asset.gold;
-
-            // m_characterMotor.EventOnDeath.AddListener(GiveGold);
+            buff = asset.buff;
         }
 
         public void DamagePlayer()

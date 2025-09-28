@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace TowerDefense
+namespace TowerDefence
 {
     public class SpriteFacing : MonoBehaviour
     {

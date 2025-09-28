@@ -34,6 +34,7 @@ public class Turret : MonoBehaviour
         if (m_RefireTimer > 0) return;
 
         Projectile projectile = Instantiate(m_TurretProperties.ProjectilePrefab).GetComponent<Projectile>();
+        projectile.GetComponentInChildren<SpriteRenderer>().sprite = m_TurretProperties.ProjectileSprite;
         projectile.transform.position = transform.position;
         projectile.transform.up = transform.up;
 
@@ -42,5 +43,9 @@ public class Turret : MonoBehaviour
         {
             // TODO: Add sound effects / muzzle flash here
         }
+    }
+    public void SetTurretProperties(TurretProperties properties)
+    {
+        m_TurretProperties = properties;
     }
 }
