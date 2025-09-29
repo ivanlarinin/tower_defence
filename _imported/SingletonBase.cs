@@ -7,22 +7,33 @@ using UnityEngine;
 [DisallowMultipleComponent]
 public abstract class SingletonBase<T> : MonoBehaviour where T : MonoBehaviour
 {
-    // The single instance of this class
-    public static T Instance { get; private set; }
+    /// <summary>
+    /// Automatically mark object as persistent.
+    /// </summary>
+    [Header("Singleton")]
+    [SerializeField] private bool m_DoNotDestroyOnLoad;
 
     /// <summary>
-    /// Initializes the singleton instance.
-    /// If another instance exists, this one will be destroyed.
+    /// Singleton instance. May be null if DoNotDestroyOnLoad flag was not set.
     /// </summary>
-    public void Init()
+    public static T Instance { get; private set; }
+
+    #region Unity events
+
+    protected virtual void Awake()
     {
         if (Instance != null)
         {
-            Debug.LogWarning("MonoSingleton: object of type already exists, instance will be destroyed - " + typeof(T).Name);
+            Debug.LogWarning("MonoSingleton: object of type already exists, instance will be destroyed=" + typeof(T).Name);
             Destroy(this);
             return;
         }
 
         Instance = this as T;
+
+        if (m_DoNotDestroyOnLoad)
+            DontDestroyOnLoad(gameObject);
     }
+
+    #endregion
 }

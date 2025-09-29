@@ -65,7 +65,7 @@ namespace TowerDefence
                     other.AddHitPoints(10);
                     if (m_buffFX != null)
                     {
-                        Debug.Log($"Buffed {other.name}");
+                        // Debug.Log($"Buffed {other.name}");
                         Instantiate(m_buffFX, other.transform.position, Quaternion.identity);
                     }
                 }
