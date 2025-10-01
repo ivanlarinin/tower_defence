@@ -11,7 +11,7 @@ namespace TowerDefence
         protected abstract GameObject GenerateSpawnedEntity();
         [SerializeField] private CircleArea m_Area;
 
-        [SerializeField] private Path m_Path;
+        [SerializeField] private EnemyPath m_Path;
         [SerializeField] private EnemyAsset[] m_EnemySettings;
         [SerializeField] private SpawnMode m_SpawnMode = SpawnMode.Start;
         [SerializeField] private int m_NumSpawns = 1;

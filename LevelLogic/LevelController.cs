@@ -22,6 +22,7 @@ namespace TowerDefence
 
         private bool m_IsLevelCompleted;
         private float m_LevelTime;
+        public int levelScore => 1;
 
         // public bool HasNextLevel => m_LevelProperties.NextLevel != null;
         public float LevelTime => m_LevelTime;
@@ -71,6 +72,7 @@ namespace TowerDefence
             {
                 m_IsLevelCompleted = true;
                 StopLevelActivity();
+                MapCompletion.SaveEpisodeResult(levelScore);
                 Show(m_IsLevelCompleted);
 
             }
