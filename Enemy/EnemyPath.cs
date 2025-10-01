@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace TowerDefence
 {
-    public class Path : MonoBehaviour
+    public class EnemyPath : MonoBehaviour
     {
         [SerializeField] private List<Transform> m_Points = new List<Transform>();
 

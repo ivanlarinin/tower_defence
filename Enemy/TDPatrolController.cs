@@ -7,8 +7,8 @@ namespace TowerDefence
     public class TDPatrolController : MonoBehaviour
     {
         [Header("Patrol Route")]
-        [SerializeField] private Path m_Path;
-        public void SetPath(Path path) => m_Path = path;
+        [SerializeField] private EnemyPath m_Path;
+        public void SetPath(EnemyPath path) => m_Path = path;
 
         private AIController m_AI;
         [SerializeField] private UnityEvent m_OnArrive;
