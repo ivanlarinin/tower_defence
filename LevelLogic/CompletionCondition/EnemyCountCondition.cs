@@ -4,6 +4,13 @@ namespace TowerDefence
 {
     public class EnemyCountCondition : LevelCondition
     {
-        override public bool IsCompleted => FindObjectsByType<Enemy>(FindObjectsSortMode.None).Length == 0;
+        private bool enemyCount;
+
+        void Update()
+        {
+            enemyCount = FindObjectsByType<Enemy>(FindObjectsSortMode.None).Length == 0;
+        }
+
+        public override bool IsCompleted => enemyCount;
     }
 }

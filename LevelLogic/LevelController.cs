@@ -5,16 +5,10 @@ namespace TowerDefence
 {
     public interface ILevelCondition
     {
-        /// <summary>
-        /// True если условие выполнено.
-        /// </summary>
         bool IsCompleted { get; }
     }
     public class LevelController : SingletonBase<LevelController>
     {
-        public event UnityAction LevelPassed;
-        public event UnityAction LevelLost;
-
         [SerializeField] private LevelCondition[] m_Conditions;
 
         [SerializeField] private GameObject m_PanelSuccess;
@@ -27,11 +21,14 @@ namespace TowerDefence
         // public bool HasNextLevel => m_LevelProperties.NextLevel != null;
         public float LevelTime => m_LevelTime;
 
+        private int m_TimeLifePenalty = 0;
+
         #region Unity events
 
         private void Start()
         {
             m_Conditions = GetComponentsInChildren<LevelCondition>();
+            TDPlayer.Instance.PlayerDied += Lose;
         }
 
         private void Update()
@@ -40,6 +37,12 @@ namespace TowerDefence
             {
                 m_LevelTime += Time.deltaTime;
                 CheckLevelConditions();
+
+                if (m_Conditions[0].IsCompleted == true && m_TimeLifePenalty == 0)
+                {
+                    TDPlayer.Instance.ReduceLife(1);
+                    m_TimeLifePenalty = 1;
+                }
             }
         }
 
@@ -47,15 +50,10 @@ namespace TowerDefence
 
         public void Show(bool result)
         {
-            if (result)
-            {
-                // UpdateCurrentLevelStats();
-                // UpdateVisualStats();
-            }
-
             m_PanelSuccess?.gameObject.SetActive(result);
-            // m_PanelFailure?.gameObject.SetActive(!result);
+            m_PanelFailure?.gameObject.SetActive(!result);
         }
+
         private void CheckLevelConditions()
         {
             int numCompleted = 0;
@@ -74,14 +72,13 @@ namespace TowerDefence
                 StopLevelActivity();
                 MapCompletion.SaveEpisodeResult(levelScore);
                 Show(m_IsLevelCompleted);
-
             }
         }
 
         protected void Lose()
         {
-            LevelLost?.Invoke();
-            Time.timeScale = 0;
+            StopLevelActivity();
+            Show(false);
         }
 
         public void OnPlayNext()
@@ -92,6 +89,11 @@ namespace TowerDefence
         public void OnRestartLevel()
         {
             LevelSequenceController.Instance.RestartLevel();
+        }
+
+        public void OnExitToMenu()
+        {
+            LevelSequenceController.Instance.ExitToMenu();
         }
 
         private void StopLevelActivity()
