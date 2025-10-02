@@ -26,19 +26,13 @@ namespace TowerDefence
 
             SceneManager.LoadScene(e.Levels[CurrentLevel]);
         }
-
-        /// <summary>
-        /// Принудительный рестарт уровня.
-        /// </summary>
+        public void ExitToMenu()
+        {
+            SceneManager.LoadScene(MainMenuSceneNickname);
+        }
         public void RestartLevel()
         {
             SceneManager.LoadScene(CurrentEpisode.Levels[CurrentLevel]);
-        }
-
-        public void FinishCurrentLevel(bool success)
-        {
-            // после организации переходов
-            LevelController.Instance.Show(success);
         }
 
         public void AdvanceLevel()

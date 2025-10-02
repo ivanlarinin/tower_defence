@@ -9,7 +9,8 @@ namespace TowerDefence
         void Start()
         {
             var drawLevel = 0;
-            var score = 1;
+            var score = TDPlayer.Instance.NumLives;
+
             while (score != 0 && drawLevel < levels.Length &&
                    MapCompletion.Instance.TryIndex(drawLevel, out var episode, out score))
             {
