@@ -5,6 +5,8 @@ namespace TowerDefence
 {
     public class EnemyPath : MonoBehaviour
     {
+        [SerializeField] private CircleArea m_SpawnArea;
+        public CircleArea SpawnArea => m_SpawnArea;
         [SerializeField] private List<Transform> m_Points = new List<Transform>();
 
         public int Count
