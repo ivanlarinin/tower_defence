@@ -4,13 +4,13 @@ namespace TowerDefence
 {
     public class EnemyCountCondition : LevelCondition
     {
-        private bool enemyCount;
+        private bool _isCompleted;
 
-        void Update()
+        void Start()
         {
-            enemyCount = FindObjectsByType<Enemy>(FindObjectsSortMode.None).Length == 0;
+            FindObjectsByType<EnemyWavesManager>(FindObjectsInactive.Include, FindObjectsSortMode.None)[0].OnAllWavesCompleted += () => _isCompleted = true;
         }
 
-        public override bool IsCompleted => enemyCount;
+        public override bool IsCompleted => _isCompleted;
     }
 }

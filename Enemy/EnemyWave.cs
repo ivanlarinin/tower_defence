@@ -24,6 +24,11 @@ namespace TowerDefence
         [SerializeField] private PathGroup[] groups;
         [SerializeField] private float prepareTime = 10f;
 
+        public float GetRemainTime()
+        {
+            return Math.Max(0, prepareTime - Time.time);
+        }
+
         private void Awake()
         {
             enabled = false;

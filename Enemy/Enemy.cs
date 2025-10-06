@@ -1,3 +1,4 @@
+using System;
 using UnityEditor;
 using UnityEngine;
 
@@ -27,6 +28,13 @@ namespace TowerDefence
         [SerializeField] private float buffCooldown = 4f;
         private float lastBuffTime = -Mathf.Infinity;
         private int buff = 0;
+
+        public event Action OnDeath;
+
+        private void OnDestroy()
+        {
+            OnDeath?.Invoke();
+        }
 
         private void Awake()
         {

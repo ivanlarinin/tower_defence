@@ -115,6 +115,7 @@ namespace TowerDefence
             DisableAll<Spawner>();
             DisableAll<Projectile>();
             DisableAll<Tower>();
+            DisableAll<CallNextWave>();
         }
     }
 }
