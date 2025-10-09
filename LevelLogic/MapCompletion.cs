@@ -7,6 +7,8 @@ namespace TowerDefence
     {
         public const string Filename = "map_completion";
         [SerializeField] private EpisodeScore[] m_CompletionData;
+        [SerializeField] private int totalScore;
+        public int TotalScore => totalScore;
 
         [Serializable]
         private class EpisodeScore
@@ -54,19 +56,22 @@ namespace TowerDefence
                     }
                 }
             }
+            foreach (var episodeScore in m_CompletionData)
+            {
+                totalScore += episodeScore.BestScore;
+            }
         }
 
-        public bool TryIndex(int id, out Episode episode, out int score)
+        public int GetEpisodeScore(Episode episode)
         {
-            if (id >= 0 && id < m_CompletionData.Length)
+            foreach (var episodeScore in m_CompletionData)
             {
-                episode = m_CompletionData[id].Episode;
-                score = m_CompletionData[id].BestScore;
-                return true;
+                if (episodeScore.Episode == episode)
+                {
+                    return episodeScore.BestScore;
+                }
             }
-            episode = null;
-            score = 0;
-            return false;
+            return 0;
         }
     }
 }

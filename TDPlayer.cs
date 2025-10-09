@@ -10,8 +10,9 @@ namespace TowerDefence
     {
         public static new TDPlayer Instance { get; private set; }
 
-        private void Awake()
+        protected override void Awake()
         {
+            base.Awake();
             Instance = this;
         }
 
