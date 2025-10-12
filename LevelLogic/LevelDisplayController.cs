@@ -4,27 +4,28 @@ namespace TowerDefence
 {
     public class LevelDisplayController : MonoBehaviour
     {
-        [SerializeField] private MapLevel[] levels;
-        [SerializeField] private BranchLevel[] branchLevels;
+        private MapLevel[] levels;
+        private BranchLevel[] branchLevels;
 
-        void Start()
+        private void Start()
         {
-            var drawLevel = 0;
-            var score = TDPlayer.Instance.NumLives;
+            levels = FindObjectsByType<MapLevel>(FindObjectsSortMode.None);
+            branchLevels = FindObjectsByType<BranchLevel>(FindObjectsSortMode.None);
 
-            while (score != 0 && drawLevel < levels.Length)
-            {
-                levels[drawLevel].Initialize();
-                drawLevel += 1;
-            }
-            for (int i = drawLevel; i < levels.Length; i++)
-            {
-                levels[i].gameObject.SetActive(false);
-            }
-            for (int i = 0; i < branchLevels.Length; i++)
-            {
-                branchLevels[i].TryActivate();
-            }
+            InitializeLevels();
+            InitializeBranchLevels();
+        }
+
+        private void InitializeLevels()
+        {
+            foreach (var level in levels)
+                level.Initialize();
+        }
+
+        private void InitializeBranchLevels()
+        {
+            foreach (var branch in branchLevels)
+                branch.TryActivate();
         }
     }
 }

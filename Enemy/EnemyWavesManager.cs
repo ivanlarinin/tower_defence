@@ -91,10 +91,6 @@ namespace TowerDefence
             {
                 StartWave(currentWaveIndex);
             }
-            else
-            {
-                OnAllWavesCompleted?.Invoke();
-            }
         }
 
         public void CallNextWave()

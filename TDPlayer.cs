@@ -9,6 +9,7 @@ namespace TowerDefence
     public class TDPlayer : Player
     {
         public static new TDPlayer Instance { get; private set; }
+        private static event System.Action<int> OnGoldChanged;
 
         protected override void Awake()
         {
@@ -16,10 +17,10 @@ namespace TowerDefence
             Instance = this;
         }
 
-        private static event System.Action<int> OnGoldChanged;
         public static void GoldUpdateSubscribe(Action<int> act)
         {
             OnGoldChanged += act;
+            act(Instance.m_gold);
         }
         private static event System.Action<int> OnLivesChanged;
         public static void LivesUpdateSubscribe(Action<int> act)
@@ -29,10 +30,14 @@ namespace TowerDefence
         }
 
         [SerializeField] private int m_gold = 0;
+        [SerializeField] private int m_goldSpent = 0;
+        public int GoldSpent => m_goldSpent;
 
         public void ChangeGold(int change)
         {
             m_gold += change;
+
+            if (change < 0) m_goldSpent += Mathf.Abs(change);
             if (OnGoldChanged != null)
             {
                 // Debug.Log("Invoking OnGoldChanged with " + m_gold);

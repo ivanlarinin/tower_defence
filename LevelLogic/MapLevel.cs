@@ -1,49 +1,41 @@
-using System;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.SocialPlatforms.Impl;
 using UnityEngine.UI;
+
 namespace TowerDefence
 {
     public class MapLevel : MonoBehaviour
     {
-        private Episode m_episode;
-        private RectTransform resultPanel;
-        [SerializeField] private Text text;
+        [SerializeField] private Episode m_episode;
+        [SerializeField] private MapLevel m_prevEpisode;
+        [SerializeField] private RectTransform resultPanel;
+        [SerializeField] private Image[] stars;
 
-        // If self is active
-        public bool IsComplete
-        {
-            get
-            {
-                return gameObject.activeSelf.Equals(true) && resultPanel.gameObject.activeSelf.Equals(true);
+        public Episode Episode => m_episode;
 
-            }
-        }
-        
+        public bool IsComplete => gameObject.activeSelf && resultPanel.gameObject.activeSelf;
+
         public void LoadLevel()
         {
-            if (m_episode == null) return;
-            LevelSequenceController.Instance.StartEpisode(m_episode);
-        }
-        public void SetLevelData(Episode episode, int score)
-        {
-            m_episode = episode;
-            resultPanel.GameObject().SetActive(score > 0);
-            text.text = $"{score}/3";
+            if (m_episode != null)
+                LevelSequenceController.Instance.StartEpisode(m_episode);
         }
 
         public void Initialize()
         {
-            var score = MapCompletion.Instance.GetEpisodeScore(m_episode);
-            resultPanel.gameObject.SetActive(score > 0);
-            for (int i = 0; i < score; i++)
+            int score = MapCompletion.Instance.GetEpisodeScore(m_episode);
+            // resultPanel.gameObject.SetActive(score > 0);
+
+            for (int i = 0; i < stars.Length; i++)
+                stars[i].gameObject.SetActive(i < score);
+
+            if (m_prevEpisode != null)
             {
-                var child = transform.GetChild(i);
-                if (child.name.StartsWith("Star"))
-                {
-                    // resultPanel[i].color = Color.white;
-                }
+                bool unlocked = MapCompletion.Instance.GetEpisodeScore(m_prevEpisode.Episode) > 0;
+                gameObject.SetActive(unlocked);
+            }
+            else
+            {
+                gameObject.SetActive(true);
             }
         }
     }

@@ -1,121 +1,112 @@
 using UnityEngine;
-using UnityEngine.Events;
 
 namespace TowerDefence
 {
-    public interface ILevelCondition
-    {
-        bool IsCompleted { get; }
-    }
     public class LevelController : SingletonBase<LevelController>
     {
-        [SerializeField] private LevelCondition[] m_Conditions;
-
+        [Header("UI Panels")]
         [SerializeField] private GameObject m_PanelSuccess;
         [SerializeField] private GameObject m_PanelFailure;
 
+        [Header("Score Settings")]
+        [SerializeField] private float maxTimeForFullScore = 60f;
+        [SerializeField] private int maxGoldUsedForFullScore = 30;
+
         private bool m_IsLevelCompleted;
         private float m_LevelTime;
-        public int levelScore => 1;
 
-        // public bool HasNextLevel => m_LevelProperties.NextLevel != null;
         public float LevelTime => m_LevelTime;
-
-        private int m_TimeLifePenalty = 0;
-
-        #region Unity events
 
         private void Start()
         {
-            m_Conditions = GetComponentsInChildren<LevelCondition>();
             TDPlayer.Instance.PlayerDied += Lose;
+        
+            var wavesManager = FindObjectsByType<EnemyWavesManager>(FindObjectsSortMode.None)[0];
+            if (wavesManager != null)
+                wavesManager.OnAllWavesCompleted += OnLevelCompleted;
         }
 
         private void Update()
         {
-            if (m_IsLevelCompleted == false)
-            {
-                m_LevelTime += Time.deltaTime;
-                CheckLevelConditions();
+            if (m_IsLevelCompleted)
+                return;
 
-                if (m_Conditions[0].IsCompleted == true && m_TimeLifePenalty == 0)
-                {
-                    TDPlayer.Instance.ReduceLife(1);
-                    m_TimeLifePenalty = 1;
-                }
-            }
+            m_LevelTime += Time.deltaTime;
         }
 
-        #endregion
-
-        public void Show(bool result)
+        private void OnLevelCompleted()
         {
-            m_PanelSuccess?.gameObject.SetActive(result);
-            m_PanelFailure?.gameObject.SetActive(!result);
+            if (m_IsLevelCompleted)
+                return;
+
+            m_IsLevelCompleted = true;
+            StopLevelActivity();
+
+            var currentEpisode = LevelSequenceController.Instance.CurrentEpisode;
+            MapCompletion.SaveEpisodeResult(currentEpisode, LevelScore);
+
+            Show(true);
         }
 
-        private void CheckLevelConditions()
-        {
-            int numCompleted = 0;
-
-            for (int i = 0; i < m_Conditions.Length; i++)
-            {
-                if (m_Conditions[i].IsCompleted == true)
-                {
-                    numCompleted++;
-                }
-            }
-
-            if (numCompleted == m_Conditions.Length)
-            {
-                m_IsLevelCompleted = true;
-                StopLevelActivity();
-                MapCompletion.SaveEpisodeResult(levelScore);
-                Show(m_IsLevelCompleted);
-            }
-        }
-
-        protected void Lose()
+        private void Lose()
         {
             StopLevelActivity();
             Show(false);
         }
 
-        public void OnPlayNext()
-        {
-            LevelSequenceController.Instance.AdvanceLevel();
-        }
-
-        public void OnRestartLevel()
-        {
-            LevelSequenceController.Instance.RestartLevel();
-        }
-
-        public void OnExitToMenu()
-        {
-            LevelSequenceController.Instance.ExitToMenu();
-        }
-
         private void StopLevelActivity()
         {
-            foreach (var enemy in FindObjectsByType<Enemy>(FindObjectsSortMode.None))
-            {
-                enemy.GetComponent<CharacterMotor>().enabled = false;
-                enemy.GetComponent<Rigidbody2D>().linearVelocity = Vector3.zero;
-            }
-
             void DisableAll<T>() where T : MonoBehaviour
             {
-                foreach (var component in FindObjectsByType<T>(FindObjectsSortMode.None))
-                {
-                    component.enabled = false;
-                }
+                foreach (var comp in FindObjectsByType<T>(FindObjectsSortMode.None))
+                    comp.enabled = false;
             }
 
+            DisableAll<CharacterMotor>();
+            DisableAll<Enemy>();
             DisableAll<Spawner>();
             DisableAll<Projectile>();
             DisableAll<Tower>();
             DisableAll<CallNextWave>();
+        }
+
+        private void Show(bool success)
+        {
+            m_PanelSuccess?.SetActive(success);
+            m_PanelFailure?.SetActive(!success);
+        }
+
+        public void OnPlayNext()
+        {
+            LevelSequenceController.Instance.AdvanceLevel();
+            m_PanelSuccess?.SetActive(false);
+        }
+        public void OnRestartLevel() => LevelSequenceController.Instance.RestartLevel();
+        public void OnExitToMenu() => LevelSequenceController.Instance.ExitToMenu();
+
+        /// <summary>
+        /// Calculates the number of stars (1-3) based on performance.
+        /// </summary>
+        public int LevelScore
+        {
+            get
+            {
+                int stars = 3;
+
+                // 1. Time penalty
+                if (m_LevelTime > maxTimeForFullScore)
+                    stars--;
+
+                // 2. Lives lost penalty
+                if (TDPlayer.Instance.NumLives > 3)
+                    stars--;
+
+                // 3. Gold usage penalty
+                if (TDPlayer.Instance.GoldSpent > maxGoldUsedForFullScore)
+                    stars--;
+
+                return Mathf.Clamp(stars, 1, 3);
+            }
         }
     }
 }
