@@ -9,8 +9,8 @@ namespace TowerDefence
         [SerializeField] private GameObject m_PanelFailure;
 
         [Header("Score Settings")]
-        [SerializeField] private float maxTimeForFullScore = 60f;
-        [SerializeField] private int maxGoldUsedForFullScore = 30;
+        [SerializeField] private float maxTimeForFullScore = 40f;
+        [SerializeField] private int maxGoldUsedForFullScore = 10;
 
         private bool m_IsLevelCompleted;
         private float m_LevelTime;

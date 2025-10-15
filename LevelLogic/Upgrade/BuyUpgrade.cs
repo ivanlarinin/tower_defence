@@ -7,29 +7,38 @@ namespace TowerDefence
     {
         [SerializeField] private UpgradeAsset asset;
         [SerializeField] private Button upgradeButton;
-        [SerializeField] private Text cost, level;
+        [SerializeField] private Text cost;
+        [SerializeField] private Text level;
         [SerializeField] private Image icon;
 
         public void Initialize()
         {
             icon.sprite = asset.sprite;
-            var savedLevel = Upgrades.GetUpgradeLevel(asset);
-            this.level.text = $"Level {savedLevel + 1}";
-            cost.text = asset.costByLevel[savedLevel].ToString();
+
+            int savedLevel = Upgrades.GetUpgradeLevel(asset);
             if (savedLevel >= asset.costByLevel.Length)
             {
+                level.text = $"Level {savedLevel}";
                 cost.text = "MAX";
-                upgradeButton.transform.parent.gameObject.SetActive(false);
+                upgradeButton.interactable = false;
+                return;
             }
-            else
-            {
-                cost.text = asset.costByLevel[savedLevel].ToString();
-            }
+
+            level.text = $"Level {savedLevel + 1}";
+            cost.text = asset.costByLevel[savedLevel].ToString();
+            upgradeButton.interactable = true;
         }
 
         public void Buy()
         {
-            Upgrades.BuyUpgrade(asset);
+            if (UpgradeShop.Instance.TryBuyUpgrade(asset))
+            {
+                Initialize();
+            }
+            else
+            {
+                Debug.Log("[BuyUpgrade] Purchase failed (not enough money or max level)");
+            }
         }
     }
 }

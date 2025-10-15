@@ -3,7 +3,6 @@ using UnityEditor;
 using UnityEngine;
 
 /// <summary>
-/// Enemy component. Requires an AIController and CharacterMotor2D component.
 /// </summary>
 namespace TowerDefence
 {
@@ -18,6 +17,7 @@ namespace TowerDefence
         [SerializeField] private CircleCollider2D m_circleCollider;
         [SerializeField] private Transform m_Scale;
         [SerializeField] private int m_damage = 1;
+        [SerializeField] private int m_armor = 1;
         [SerializeField] private int m_gold = 1;
         private AIController m_aiController;
         private CharacterMotor m_characterMotor;
@@ -29,7 +29,36 @@ namespace TowerDefence
         private float lastBuffTime = -Mathf.Infinity;
         private int buff = 0;
 
+        [SerializeField] private ArmorType m_ArmorType;
+
         public event Action OnDeath;
+
+        public enum ArmorType { Base = 0, Mage = 1 }
+        private static Func<int, DamageType, int, int>[] ArmorDamageFunctions =
+        {
+            // Base armor
+            (power, type, armor) =>
+            {
+                switch(type)
+                {
+                    case DamageType.Magic: return power;
+                    default: return Mathf.Min(power - armor, 1);
+                }
+            },
+
+            // Mage armor
+            (power, type, armor) =>
+            {
+                switch(type)
+                {
+                    case DamageType.Magic: return Mathf.Min(power - armor, 1);
+                    default: return power;
+                }
+            }
+        };
+
+
+        private Destructable m_destructable;
 
         private void OnDestroy()
         {
@@ -91,6 +120,8 @@ namespace TowerDefence
 
             if (!m_Scale && m_spriteRenderer)
                 m_Scale = m_spriteRenderer.transform;
+
+            m_destructable = GetComponent<Destructable>();
         }
 
         public void Use(EnemyAsset asset)
@@ -120,6 +151,7 @@ namespace TowerDefence
             m_damage = asset.damage;
             m_gold = asset.gold;
             buff = asset.buff;
+            m_armor = asset.armor;
         }
 
         public void DamagePlayer()
@@ -135,6 +167,16 @@ namespace TowerDefence
                 player.ChangeGold(m_gold);
             }
         }
+
+        public void TakeDamage(int damage, DamageType damageType)
+        {
+            if (m_destructable != null)
+            {
+                int finalDamage = ArmorDamageFunctions[(int)m_ArmorType](damage, damageType, m_armor);
+                m_destructable.ApplyDamage(finalDamage, damageType);
+            }
+        }
+
     }
 
     [CustomEditor(typeof(Enemy))]

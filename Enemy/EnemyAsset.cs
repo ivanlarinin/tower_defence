@@ -12,8 +12,10 @@ namespace TowerDefence
         [field: SerializeField] public Color color = Color.white;
         [field: SerializeField] public RuntimeAnimatorController animations;
         [field: SerializeField] public int damage = 1;
-        [field: SerializeField] public int gold = 1; 
+        [field: SerializeField] public int gold = 1;
         [field: SerializeField] public int buff = 0;
+        [field: SerializeField] public int armor = 0;
+        [field: SerializeField] public Enemy.ArmorType armorType;
 
         [field: SerializeField] public float Radius { get; private set; }
 

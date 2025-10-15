@@ -15,6 +15,7 @@ public class WaveEditorWindow : EditorWindow
     private float prepareTime = 10f;
     private Vector2 scrollPos;
 
+    private string sceneName = "SampleScene"; // new field
     private WaveConfig config;
     private string jsonPath;
 
@@ -26,12 +27,22 @@ public class WaveEditorWindow : EditorWindow
 
     private void OnEnable()
     {
-        jsonPath = Path.Combine(Application.dataPath, "waves.json");
+        UpdateJsonPath();
         LoadJson();
     }
 
     private void OnGUI()
     {
+        GUILayout.Label("Scene Settings", EditorStyles.boldLabel);
+        sceneName = EditorGUILayout.TextField("Scene Name", sceneName);
+
+        if (GUILayout.Button("Load JSON for Scene"))
+        {
+            UpdateJsonPath();
+            LoadJson();
+        }
+
+        GUILayout.Space(10);
         GUILayout.Label("Add/Edit Enemy Squad", EditorStyles.boldLabel);
 
         currentWave = EditorGUILayout.IntField("Current Wave", currentWave);
@@ -53,12 +64,8 @@ public class WaveEditorWindow : EditorWindow
 
         if (GUILayout.Button("Save JSON"))
         {
+            UpdateJsonPath();
             SaveJson();
-        }
-
-        if (GUILayout.Button("Load JSON"))
-        {
-            LoadJson();
         }
 
         GUILayout.Space(20);
@@ -104,15 +111,24 @@ public class WaveEditorWindow : EditorWindow
 
     }
 
+    private void UpdateJsonPath()
+    {
+        // Use scene name to generate unique file
+        string fileName = $"{sceneName}_waves.json";
+        jsonPath = Path.Combine(Application.dataPath, fileName);
+    }
+
     private void AddOrEditWave()
     {
+        if (config == null) config = new WaveConfig();
+
         while (config.waves.Count <= currentWave)
         {
             config.waves.Add(new WaveData());
         }
 
         WaveData wave = config.waves[currentWave];
-        wave.prepareTime = prepareTime; // save wait time
+        wave.prepareTime = prepareTime;
 
         while (wave.groups.Count <= currentGroup)
         {
@@ -120,7 +136,7 @@ public class WaveEditorWindow : EditorWindow
         }
 
         GroupData group = wave.groups[currentGroup];
-        group.pathIndex = currentGroup; // example
+        group.pathIndex = currentGroup;
 
         group.squads.Clear();
         if (enemyOneCount > 0)
@@ -130,12 +146,12 @@ public class WaveEditorWindow : EditorWindow
         if (enemyThreeCount > 0)
             group.squads.Add(new SquadData { asset = enemyAssets[2], count = enemyThreeCount });
 
-        Debug.Log($"Wave {currentWave}, Group {currentGroup} updated with wait time {prepareTime}s.");
+        Debug.Log($"Wave {currentWave}, Group {currentGroup} updated for scene '{sceneName}'.");
     }
-
 
     private void SaveJson()
     {
+        if (config == null) return;
         string json = JsonUtility.ToJson(config, true);
         File.WriteAllText(jsonPath, json);
         Debug.Log($"Saved JSON to {jsonPath}");
@@ -147,7 +163,7 @@ public class WaveEditorWindow : EditorWindow
         {
             string json = File.ReadAllText(jsonPath);
             config = JsonUtility.FromJson<WaveConfig>(json);
-            Debug.Log("Loaded waves.json");
+            Debug.Log($"Loaded waves from {jsonPath}");
         }
         else
         {
@@ -155,7 +171,7 @@ public class WaveEditorWindow : EditorWindow
             Debug.Log("No existing JSON found. Created new config.");
         }
 
-        PopulateGuiFields(); // sync GUI with loaded data
+        PopulateGuiFields();
     }
 
     private void PopulateGuiFields()
@@ -163,7 +179,7 @@ public class WaveEditorWindow : EditorWindow
         if (config.waves.Count > currentWave)
         {
             WaveData wave = config.waves[currentWave];
-            prepareTime = wave.prepareTime; // populate wait time
+            prepareTime = wave.prepareTime;
 
             if (wave.groups.Count > currentGroup)
             {
@@ -197,6 +213,4 @@ public class WaveEditorWindow : EditorWindow
             enemyThreeCount = 0;
         }
     }
-
-
 }

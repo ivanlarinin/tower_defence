@@ -58,6 +58,16 @@ namespace TowerDefence
                 totalScore += score.BestScore;
         }
 
+        public bool TrySpendScore(int amount)
+        {
+            if (totalScore >= amount)
+            {
+                totalScore -= amount;
+                return true;
+            }
+            return false;
+        }
+
         private void SaveAllEpisodes()
         {
             Saver<EpisodeScore[]>.Save(Filename, new List<EpisodeScore>(_scoreLookup.Values).ToArray());

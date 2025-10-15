@@ -1,37 +1,38 @@
 using UnityEngine;
 
-/// <summary>
-/// Defines whether a turret is a primary or secondary weapon.
-/// Primary = uses energy, Secondary = uses ammo.
-/// </summary>
-public enum TurretMode
+namespace TowerDefence
 {
-    Primary,
-    Secondary,
-    Auto
-}
+    public enum TurretMode
+    {
+        Primary,
+        Secondary,
+        Auto
+    }
 
-[CreateAssetMenu]
-public sealed class TurretProperties : ScriptableObject
-{
-    [SerializeField] private TurretMode m_Mode;
-    public TurretMode Mode => m_Mode;
+    [CreateAssetMenu]
+    public sealed class TurretProperties : ScriptableObject
+    {
+        [SerializeField] private TurretMode m_Mode;
+        public TurretMode Mode => m_Mode;
 
-    [SerializeField] private Projectile m_ProjectilePrefab;
-    public Projectile ProjectilePrefab => m_ProjectilePrefab;
+        [SerializeField] private Projectile m_ProjectilePrefab;
+        public Projectile ProjectilePrefab => m_ProjectilePrefab;
 
-    [SerializeField] private Sprite m_ProjectileSprite;
-    public Sprite ProjectileSprite => m_ProjectileSprite;
+        [SerializeField] private Sprite m_ProjectileSprite;
+        public Sprite ProjectileSprite => m_ProjectileSprite;
 
-    [SerializeField] private float m_RateOfFire;
-    public float RateOfFire => m_RateOfFire;
+        [SerializeField] private float m_RateOfFire;
+        public float RateOfFire => m_RateOfFire;
 
-    [SerializeField] private int m_EnergyUsage;
-    public int EnergyUsage => m_EnergyUsage;
+        public UpgradeAsset DamageUpgradeAsset;
 
-    [SerializeField] private int m_AmmoUsage;
-    public int AmmoUsage => m_AmmoUsage;
+        [SerializeField] private int m_EnergyUsage;
+        public int EnergyUsage => m_EnergyUsage;
 
-    [SerializeField] private AudioClip m_LaunchSFX;
-    public AudioClip LaunchSFX => m_LaunchSFX;
+        [SerializeField] private int m_AmmoUsage;
+        public int AmmoUsage => m_AmmoUsage;
+
+        [SerializeField] private AudioClip m_LaunchSFX;
+        public AudioClip LaunchSFX => m_LaunchSFX;
+    }
 }

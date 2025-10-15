@@ -17,7 +17,31 @@ namespace TowerDefence
         private new void Awake()
         {
             base.Awake();
-            Saver<UpgradeSave[]>.TryLoad(filename, out save);
+
+            if (!Saver<UpgradeSave[]>.TryLoad(filename, out save) || save == null || save.Length == 0)
+            {
+                Debug.Log("[Upgrades] No save found — initializing from UpgradeAssets");
+
+                // find all UpgradeAsset files (assuming they live in a Resources folder)
+                var allAssets = Resources.LoadAll<UpgradeAsset>("");
+
+                save = new UpgradeSave[allAssets.Length];
+                for (int i = 0; i < allAssets.Length; i++)
+                {
+                    save[i] = new UpgradeSave
+                    {
+                        asset = allAssets[i],
+                        level = 0
+                    };
+                }
+
+                Saver<UpgradeSave[]>.Save(filename, save);
+                Debug.Log($"[Upgrades] Created new upgrades.dat with {save.Length} entries");
+            }
+            else
+            {
+                Debug.Log($"[Upgrades] Loaded {save.Length} upgrades from file");
+            }
         }
 
         public static void BuyUpgrade(UpgradeAsset asset)
@@ -43,5 +67,28 @@ namespace TowerDefence
             }
             return 0;
         }
+
+        public void ApplyUpgradesToPlayer(TDPlayer player)
+        {
+            foreach (var upgrade in save)
+            {
+                switch (upgrade.asset.upgradeType)
+                {
+                    case UpgradeAsset.UpgradeType.ExtraLife:
+                        player.AddLife(upgrade.level);
+                        break;
+
+                    case UpgradeAsset.UpgradeType.DamageBoost:
+                        // player.AddDamage(upgrade.level);
+                        break;
+
+                    case UpgradeAsset.UpgradeType.SpeedBoost:
+                        // player.AddSpeed(upgrade.level);
+                        break;
+                }
+            }
+        }
+
+
     }
 }

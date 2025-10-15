@@ -2,6 +2,7 @@ using System.IO;
 using UnityEngine;
 using System.Collections.Generic;
 using System;
+using UnityEngine.SceneManagement;
 
 namespace TowerDefence
 {
@@ -37,7 +38,9 @@ namespace TowerDefence
 
         private void LoadWaveJson()
         {
-            string path = Path.Combine(Application.dataPath, "waves.json");
+            string sceneName = SceneManager.GetActiveScene().name;
+            string fileName = $"{sceneName}_waves.json";
+            string path = Path.Combine(Application.dataPath, fileName);
             if (File.Exists(path))
             {
                 string json = File.ReadAllText(path);

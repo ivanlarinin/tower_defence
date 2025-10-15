@@ -19,6 +19,7 @@ namespace TowerDefence
         public void StartGame()
         {
             FileHandler.DeleteFile(MapCompletion.Filename);
+            FileHandler.DeleteFile(Upgrades.filename);
             SceneManager.LoadScene(1);
         }
         public void ContinueGame()

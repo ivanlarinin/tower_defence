@@ -12,7 +12,7 @@ namespace TowerDefence
 
         public Episode Episode => m_episode;
 
-        public bool IsComplete => gameObject.activeSelf && resultPanel.gameObject.activeSelf;
+        public bool IsComplete => MapCompletion.Instance.GetEpisodeScore(m_episode) == 3;
 
         public void LoadLevel()
         {
