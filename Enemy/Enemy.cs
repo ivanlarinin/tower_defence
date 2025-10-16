@@ -2,38 +2,40 @@ using System;
 using UnityEditor;
 using UnityEngine;
 
-/// <summary>
-/// </summary>
 namespace TowerDefence
 {
+    /// <summary>
+    /// Represents an enemy in the game, including its stats, behavior, and interactions with the player.
+    /// </summary>
     [DisallowMultipleComponent]
     [SelectionBase]
     [RequireComponent(typeof(AIController))]
-    [RequireComponent(typeof(CharacterMotor))]
-    public class Enemy : MonoBehaviour
+    [RequireComponent(typeof(Enemy))]
+    public class Enemy : Destructable
     {
-        [SerializeField] private SpriteRenderer m_spriteRenderer;
-        [SerializeField] private Animator m_animator;
-        [SerializeField] private CircleCollider2D m_circleCollider;
-        [SerializeField] private Transform m_Scale;
-        [SerializeField] private int m_damage = 1;
-        [SerializeField] private int m_armor = 1;
-        [SerializeField] private int m_gold = 1;
-        private AIController m_aiController;
-        private CharacterMotor m_characterMotor;
+        #region Fields and Properties
 
-        // Buff related
-        [SerializeField] private GameObject m_buffFX;
-        [SerializeField] private float m_buffRadius = 2f;
-        [SerializeField] private float buffCooldown = 4f;
-        private float lastBuffTime = -Mathf.Infinity;
-        private int buff = 0;
+        [SerializeField] private SpriteRenderer m_SpriteRenderer;
+        [SerializeField] private Animator m_Animator;
+        [SerializeField] private CircleCollider2D m_CircleCollider;
+        [SerializeField] private Transform m_Scale;
+        [SerializeField] private int m_Damage = 1;
+        [SerializeField] private int m_Armor = 1;
+        [SerializeField] private int m_Gold = 1;
+        private AIController m_AIController;
+        private CharacterMotor m_CharacterMotor;
+
+        // Buff-related fields
+        [SerializeField] private GameObject m_BuffFX;
+        [SerializeField] private float m_BuffRadius = 2f;
+        [SerializeField] private float m_BuffCooldown = 4f;
+        private float m_LastBuffTime = -Mathf.Infinity;
+        private int m_Buff = 0;
 
         [SerializeField] private ArmorType m_ArmorType;
 
-        public event Action OnDeath;
-
         public enum ArmorType { Base = 0, Mage = 1 }
+
         private static Func<int, DamageType, int, int>[] ArmorDamageFunctions =
         {
             // Base armor
@@ -42,7 +44,7 @@ namespace TowerDefence
                 switch(type)
                 {
                     case DamageType.Magic: return power;
-                    default: return Mathf.Min(power - armor, 1);
+                    default: return Mathf.Max(power - armor, 1);
                 }
             },
 
@@ -51,47 +53,63 @@ namespace TowerDefence
             {
                 switch(type)
                 {
-                    case DamageType.Magic: return Mathf.Min(power - armor, 1);
+                    case DamageType.Magic: return Mathf.Max(power - armor, 1);
                     default: return power;
                 }
             }
         };
 
+        private Destructable m_Destructable;
 
-        private Destructable m_destructable;
+        #endregion
 
-        private void OnDestroy()
-        {
-            OnDeath?.Invoke();
-        }
+        #region Unity Methods
 
+
+
+        /// <summary>
+        /// Caches references to required components.
+        /// </summary>
         private void Awake()
         {
             CacheRefs();
-            if (m_characterMotor != null)
-                m_characterMotor.EventOnDeath.AddListener(GiveGold);
+            DeathEvent += GiveGold;
         }
 
+
+        /// <summary>
+        /// Validates and caches references in the editor.
+        /// </summary>
         private void OnValidate()
         {
             if (Application.isPlaying) return;
             CacheRefs();
         }
 
+        /// <summary>
+        /// Updates the enemy's behavior, including buffing nearby enemies if applicable.
+        /// </summary>
         private void Update()
         {
-            if (buff == 1)
+            if (m_Buff == 1)
                 TryBuffNearbyEnemy();
         }
 
+        #endregion
+
+        #region Buff Logic
+
+        /// <summary>
+        /// Attempts to buff nearby enemies within the buff radius.
+        /// </summary>
         private void TryBuffNearbyEnemy()
         {
-            if (Time.time - lastBuffTime < buffCooldown)
+            if (Time.time - m_LastBuffTime < m_BuffCooldown)
                 return;
 
-            lastBuffTime = Time.time;
+            m_LastBuffTime = Time.time;
 
-            Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, m_buffRadius);
+            Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, m_BuffRadius);
             foreach (var hit in hits)
             {
                 if (hit.gameObject == this.gameObject) continue;
@@ -99,48 +117,62 @@ namespace TowerDefence
                 CharacterMotor other = hit.GetComponentInParent<CharacterMotor>();
                 if (other != null)
                 {
-                    other.AddHitPoints(10);
-                    if (m_buffFX != null)
+                    AddHitPoints(10);
+                    if (m_BuffFX != null)
                     {
-                        // Debug.Log($"Buffed {other.name}");
-                        Instantiate(m_buffFX, other.transform.position, Quaternion.identity);
+                        Instantiate(m_BuffFX, other.transform.position, Quaternion.identity);
                     }
                 }
             }
         }
 
+        #endregion
+
+        #region Helper Methods
+
+        /// <summary>
+        /// Caches references to required components.
+        /// </summary>
         private void CacheRefs()
         {
-            if (!m_spriteRenderer) m_spriteRenderer = GetComponentInChildren<SpriteRenderer>(true);
-            if (!m_animator) m_animator = GetComponentInChildren<Animator>(true);
-            if (!m_circleCollider) m_circleCollider = GetComponentInChildren<CircleCollider2D>(true);
+            if (!m_SpriteRenderer) m_SpriteRenderer = GetComponentInChildren<SpriteRenderer>(true);
+            if (!m_Animator) m_Animator = GetComponentInChildren<Animator>(true);
+            if (!m_CircleCollider) m_CircleCollider = GetComponentInChildren<CircleCollider2D>(true);
 
-            if (!m_aiController) TryGetComponent(out m_aiController);
-            if (!m_characterMotor) TryGetComponent(out m_characterMotor);
+            if (!m_AIController) TryGetComponent(out m_AIController);
+            if (!m_CharacterMotor) TryGetComponent(out m_CharacterMotor);
 
-            if (!m_Scale && m_spriteRenderer)
-                m_Scale = m_spriteRenderer.transform;
+            if (!m_Scale && m_SpriteRenderer)
+                m_Scale = m_SpriteRenderer.transform;
 
-            m_destructable = GetComponent<Destructable>();
+            m_Destructable = GetComponent<Destructable>();
         }
 
+        #endregion
+
+        #region Public Methods
+
+        /// <summary>
+        /// Configures the enemy using the specified asset.
+        /// </summary>
+        /// <param name="asset">The asset containing enemy configuration data.</param>
         public void Use(EnemyAsset asset)
         {
             CacheRefs();
 
-            if (m_spriteRenderer) m_spriteRenderer.color = asset.color;
+            if (m_SpriteRenderer) m_SpriteRenderer.color = asset.color;
 
-            if (m_animator && asset.animations)
-                m_animator.runtimeAnimatorController = asset.animations;
+            if (m_Animator && asset.animations)
+                m_Animator.runtimeAnimatorController = asset.animations;
 
-            if (m_aiController)
-                m_aiController.Speed = asset.Speed;
+            if (m_AIController)
+                m_AIController.Speed = asset.Speed;
 
-            if (m_characterMotor)
-                m_characterMotor.maxSpeed = asset.Speed;
+            if (m_CharacterMotor)
+                m_CharacterMotor.maxSpeed = asset.Speed;
 
-            if (m_circleCollider)
-                m_circleCollider.radius = asset.Radius;
+            if (m_CircleCollider)
+                m_CircleCollider.radius = asset.Radius;
 
             if (m_Scale)
             {
@@ -148,37 +180,52 @@ namespace TowerDefence
                 m_Scale.localScale = new Vector3(scale, scale, 1f);
             }
 
-            m_damage = asset.damage;
-            m_gold = asset.gold;
-            buff = asset.buff;
-            m_armor = asset.armor;
+            m_Damage = asset.damage;
+            m_Gold = asset.gold;
+            m_Buff = asset.buff;
+            m_Armor = asset.armor;
         }
 
+        /// <summary>
+        /// Damages the player with the enemy's damage value.
+        /// </summary>
         public void DamagePlayer()
         {
-            // TODO: Damage the player with m_damage
+            // TODO: Damage the player with m_Damage
         }
 
+        /// <summary>
+        /// Awards gold to the player when the enemy is killed.
+        /// </summary>
         public void GiveGold()
         {
-            TDPlayer player = FindFirstObjectByType<TDPlayer>();
+            TDPlayer player = TDPlayer.Instance;
             if (player != null)
             {
-                player.ChangeGold(m_gold);
+                player.ChangeGold(m_Gold);
             }
         }
 
+        /// <summary>
+        /// Applies damage to the enemy, considering its armor type and damage type.
+        /// </summary>
+        /// <param name="damage">The amount of damage to apply.</param>
+        /// <param name="damageType">The type of damage being applied.</param>
         public void TakeDamage(int damage, DamageType damageType)
         {
-            if (m_destructable != null)
+            if (m_Destructable != null)
             {
-                int finalDamage = ArmorDamageFunctions[(int)m_ArmorType](damage, damageType, m_armor);
-                m_destructable.ApplyDamage(finalDamage, damageType);
+                int finalDamage = ArmorDamageFunctions[(int)m_ArmorType](damage, damageType, m_Armor);
+                m_Destructable.ApplyDamage(finalDamage, damageType);
             }
         }
 
+        #endregion
     }
 
+    /// <summary>
+    /// Custom inspector for the Enemy class, allowing quick application of EnemyAsset configurations.
+    /// </summary>
     [CustomEditor(typeof(Enemy))]
     public class EnemyInspector : Editor
     {
@@ -186,10 +233,10 @@ namespace TowerDefence
         {
             base.OnInspectorGUI();
 
-            EnemyAsset a = EditorGUILayout.ObjectField(null, typeof(EnemyAsset), false) as EnemyAsset;
-            if (a)
+            EnemyAsset asset = EditorGUILayout.ObjectField(null, typeof(EnemyAsset), false) as EnemyAsset;
+            if (asset)
             {
-                (target as Enemy).Use(a);
+                (target as Enemy).Use(asset);
             }
         }
     }

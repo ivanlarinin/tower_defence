@@ -3,6 +3,9 @@ using UnityEngine;
 namespace TowerDefence
 {
     [DisallowMultipleComponent]
+    /// <summary>
+    /// Turret controller that handles firing logic and refire timing.
+    /// </summary>
     public class Turret : MonoBehaviour
     {
         [SerializeField] private TurretMode m_Mode;
@@ -13,6 +16,11 @@ namespace TowerDefence
         private float m_RefireTimer;
 
         public bool CanFire => m_RefireTimer <= 0;
+
+        /// <summary>
+        /// Gets the projectile speed from the turret properties.
+        /// </summary>
+        public float ProjectileSpeed => m_TurretProperties != null ? m_TurretProperties.ProjectileSpeed : 0;
 
         private void Start()
         {
@@ -26,19 +34,24 @@ namespace TowerDefence
             }
             else if (Mode == TurretMode.Auto)
             {
-                // Fire();
+
             }
         }
 
+        /// <summary>
+        /// Fires the turret if ready, spawning and configuring a projectile.
+        /// </summary>
         public void Fire()
         {
             if (m_TurretProperties == null) return;
             if (m_RefireTimer > 0) return;
 
-            Projectile projectile = Instantiate(m_TurretProperties.ProjectilePrefab).GetComponent<Projectile>();
+            ProjectileBase projectile = Instantiate(m_TurretProperties.ProjectilePrefab).GetComponent<ProjectileBase>();
             projectile.GetComponentInChildren<SpriteRenderer>().sprite = m_TurretProperties.ProjectileSprite;
             projectile.transform.position = transform.position;
             projectile.transform.up = transform.up;
+
+            projectile.SetVelocity(ProjectileSpeed);
 
             int damageBonus = 0;
             if (Upgrades.Instance != null)
@@ -47,15 +60,14 @@ namespace TowerDefence
                 damageBonus = damageUpgradeLevel;
             }
             projectile.Damage += damageBonus;
-            Debug.Log($"Damage bonus value: {damageBonus}");
-            
+            // Debug.Log($"Damage bonus value: {damageBonus}");
 
             m_RefireTimer = m_TurretProperties.RateOfFire;
-
-            {
-                // TODO: Add sound effects / muzzle flash here
-            }
         }
+
+        /// <summary>
+        /// Assigns turret properties at runtime.
+        /// </summary>
         public void SetTurretProperties(TurretProperties properties)
         {
             m_TurretProperties = properties;

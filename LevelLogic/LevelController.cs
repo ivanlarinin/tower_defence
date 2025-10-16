@@ -62,7 +62,7 @@ namespace TowerDefence
                     comp.enabled = false;
             }
 
-            DisableAll<CharacterMotor>();
+            DisableAll<Enemy>();
             DisableAll<Enemy>();
             DisableAll<Spawner>();
             DisableAll<Projectile>();

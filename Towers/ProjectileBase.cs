@@ -26,6 +26,14 @@ namespace TowerDefence
         }
 
         /// <summary>
+        /// Sets the velocity of the projectile dynamically.
+        /// </summary>
+        public void SetVelocity(float velocity)
+        {
+            m_Velocity = velocity;
+        }
+
+        /// <summary>
         /// Set the parent/destructable that fired this projectile
         /// </summary>
         public void SetParentShooter(Destructable parent)
@@ -38,12 +46,6 @@ namespace TowerDefence
         /// Override this to implement custom hit logic
         /// </summary>
         protected virtual void OnHit(Enemy destructible) { }
-
-        /// <summary>
-        /// Called when the projectile collides with any 2D collider
-        /// Override to implement custom collision behavior (particles, sounds)
-        /// </summary>
-        protected virtual void OnCollide2D(Collider2D collider) { }
 
         /// <summary>
         /// Called when the projectile's lifetime ends or it hits something
@@ -62,9 +64,7 @@ namespace TowerDefence
 
             if (hitCollider != null)
             {
-                OnCollide2D(hitCollider);
-
-                if (hitCollider.TryGetComponent<Enemy>(out Enemy enemy))
+                if (hitCollider.transform.parent != null && hitCollider.transform.parent.TryGetComponent(out Enemy enemy))
                 {
                     OnHit(enemy);
                     OnProjectileLifeEnd(hitCollider, hitPos);

@@ -82,11 +82,24 @@ namespace TowerDefence
                         // player.AddDamage(upgrade.level);
                         break;
 
-                    case UpgradeAsset.UpgradeType.SpeedBoost:
+                    case UpgradeAsset.UpgradeType.TimeAbility:
                         // player.AddSpeed(upgrade.level);
+                        break;
+
+                    case UpgradeAsset.UpgradeType.FireAbility:
+                        // player.AddFireAbility(upgrade.level);
                         break;
                 }
             }
+        }
+        public static int GetUpgradeLevel(UpgradeAsset.UpgradeType type)
+        {
+            foreach (var upgrade in Instance.save)
+            {
+                if (upgrade.asset.upgradeType == type)
+                    return upgrade.level;
+            }
+            return 0;
         }
 
 

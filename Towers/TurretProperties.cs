@@ -10,6 +10,9 @@ namespace TowerDefence
     }
 
     [CreateAssetMenu]
+    /// <summary>
+    /// ScriptableObject holding configuration values for a turret.
+    /// </summary>
     public sealed class TurretProperties : ScriptableObject
     {
         [SerializeField] private TurretMode m_Mode;
@@ -26,13 +29,12 @@ namespace TowerDefence
 
         public UpgradeAsset DamageUpgradeAsset;
 
-        [SerializeField] private int m_EnergyUsage;
-        public int EnergyUsage => m_EnergyUsage;
-
-        [SerializeField] private int m_AmmoUsage;
-        public int AmmoUsage => m_AmmoUsage;
+        [SerializeField] private float m_ProjectileSpeed;
+        public float ProjectileSpeed => m_ProjectileSpeed;
 
         [SerializeField] private AudioClip m_LaunchSFX;
         public AudioClip LaunchSFX => m_LaunchSFX;
+
+        
     }
 }

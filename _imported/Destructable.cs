@@ -1,12 +1,15 @@
 using UnityEngine;
 using UnityEngine.Events;
 using System.Collections.Generic;
+using System;
 
 
 namespace TowerDefence
 {
     public class Destructable : Entity
     {
+        public event Action DeathEvent;
+
         #region Properties
 
         /// <summary>
@@ -73,20 +76,6 @@ namespace TowerDefence
             m_AllDestructibles.Remove(this);
         }
 
-        public const int TeamIdNeutral = 0;
-
-        [SerializeField] private int m_TeamId;
-        public int TeamId => m_TeamId;
-
-        /// <summary>
-        /// Set the team ID for this destructible object.
-        /// </summary>
-        /// <param name="teamId">Team identifier to assign.</param>
-        public void SetTeamId(int teamId)
-        {
-            m_TeamId = teamId;
-        }
-
         public void AddHitPoints(int amount)
         {
             m_CurrentHitPoints += amount;
@@ -94,24 +83,15 @@ namespace TowerDefence
                 m_CurrentHitPoints = m_HitPoints;
         }
 
-        [SerializeField] private UnityEvent m_EventOnDeath;
-        public UnityEvent EventOnDeath => m_EventOnDeath;
-
         /// <summary>
-        /// Called when hit points drop to zero or below. Triggers VFX and destruction.
+        /// Called when hit points reach zero, triggering death logic.
         /// </summary>
         protected virtual void OnDeath()
         {
-            // Spawn explosion VFX at the current transform position
-            // if (m_ExplosionPrefab != null)
-            // {
-            //     Instantiate(m_ExplosionPrefab, transform.position, Quaternion.identity);
-            // }
-
-            // Destroy this object and fire the death event
+            DeathEvent?.Invoke();
             Destroy(gameObject);
-            m_EventOnDeath?.Invoke();
         }
+
 
         [SerializeField] private int m_ScoreValue;
         public int ScoreValue => m_ScoreValue;

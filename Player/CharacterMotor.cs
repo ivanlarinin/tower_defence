@@ -6,13 +6,13 @@ namespace TowerDefence
     /// 2D character motor for top-down movement with acceleration, deceleration, and turning.
     /// </summary>
     [RequireComponent(typeof(Rigidbody2D))]
-    public class CharacterMotor : Destructable
+    public class CharacterMotor : MonoBehaviour
     {
         [Header("Move")]
         [SerializeField] float m_MaxSpeed = 5f;
         public float maxSpeed
         {
-            private get => m_MaxSpeed;
+            get => m_MaxSpeed;
             set => m_MaxSpeed = value;
         }
         
@@ -28,6 +28,18 @@ namespace TowerDefence
         float desiredSpeed;
         float targetAngleDeg;
         bool haveTargetAngle;
+
+        float m_SpeedMultiplier = 1f;
+
+        public void SetSpeedMultiplier(float multiplier)
+        {
+            m_SpeedMultiplier = Mathf.Max(0f, multiplier);
+        }
+
+        public void HalveSpeed()
+        {
+            SetSpeedMultiplier(0.5f);
+        }
 
         public void SetDesiredMove(Vector2 dir01, float speed01)
         {
@@ -64,7 +76,7 @@ namespace TowerDefence
 
             // --- Velocity (accelerate/decelerate toward desired)
             Vector2 vel = rb.linearVelocity;
-            float targetSpeed = haveDesired ? desiredSpeed : 0f;
+            float targetSpeed = haveDesired ? desiredSpeed * m_SpeedMultiplier : 0f;
             Vector2 targetVel = haveDesired ? desiredDir * targetSpeed : Vector2.zero;
 
             float accel = (targetSpeed > vel.magnitude) ? m_Acceleration : m_Deceleration;

@@ -9,5 +9,11 @@ namespace TowerDefence
         public Sprite sprite;
         public Sprite GUIsprite;
         public TurretProperties turretProperties;
+        [SerializeField] private UpgradeAsset requiredUpgrade;
+        [SerializeField] private int requiredUpgradeLevel;
+        public bool IsAvailible() => !requiredUpgrade ||
+            requiredUpgradeLevel <= Upgrades.GetUpgradeLevel(requiredUpgrade);
+
+        public TowerAssets[] m_UpgradesTo;
     }
 }

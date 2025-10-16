@@ -8,6 +8,7 @@ namespace TowerDefence
 {
     public class EnemyWavesManager : MonoBehaviour
     {
+        public static event Action<Enemy> OnEnemySpawn;
         [SerializeField] private Enemy m_EnemyPrefab;
         [SerializeField] private EnemyPath[] paths;
         [SerializeField] private EnemyAsset[] enemyAssets;
@@ -81,10 +82,11 @@ namespace TowerDefence
                     for (int i = 0; i < squad.count; i++)
                     {
                         var e = Instantiate(m_EnemyPrefab, paths[group.pathIndex].SpawnArea.GetRandomInsideZone(), Quaternion.identity);
-                        e.OnDeath += RecordEnemyDeath;
+                        e.DeathEvent += RecordEnemyDeath;
                         e.Use(assetMap[squad.asset]);
                         e.GetComponent<TDPatrolController>().SetPath(paths[group.pathIndex]);
                         activeEnemyCount++;
+                        OnEnemySpawn?.Invoke(e);
                     }
                 }
             }

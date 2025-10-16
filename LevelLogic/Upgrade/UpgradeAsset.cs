@@ -7,7 +7,8 @@ public class UpgradeAsset : ScriptableObject
     {
         ExtraLife,
         DamageBoost,
-        SpeedBoost
+        TimeAbility,
+        FireAbility
     }
     public UpgradeType upgradeType;
 

@@ -5,7 +5,7 @@ namespace TowerDefence
     /// <summary>
     /// AI controller that moves towards a target position
     /// </summary>
-    [RequireComponent(typeof(CharacterMotor))]
+    [RequireComponent(typeof(Enemy))]
     public class AIController : MonoBehaviour
     {
         [Header("Nav")]
