@@ -98,6 +98,11 @@ namespace TowerDefence
             }
         }
 
+        public bool IsLastWaveCompleted()
+        {
+            return currentWaveIndex >= waveConfig.waves.Count;
+        }
+
         public void CallNextWave()
         {
             if (currentWaveIndex < waveConfig.waves.Count)

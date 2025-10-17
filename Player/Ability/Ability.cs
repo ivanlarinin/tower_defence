@@ -12,7 +12,7 @@ namespace TowerDefence
         {
             if (IsOnCooldown) return;
             Use();
-            // Abilities.Instance.StartCoroutine(CooldownRoutine());
+            Abilities.Instance.StartCoroutine(CooldownRoutine());
         }
 
         protected abstract void Use();

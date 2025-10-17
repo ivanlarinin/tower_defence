@@ -17,6 +17,7 @@ namespace TowerDefence
         void Start()
         {
             m_text = GetComponent<Text>();
+            Debug.Log("UI_TextUpdate: Subscribing to " + source.ToString());
             switch (source)
             {
                 case UpdateSource.PlayerLifes:
@@ -32,7 +33,27 @@ namespace TowerDefence
 
         private void UpdateText(int value)
         {
-            m_text.text = value.ToString();
+            if (m_text != null)
+            {
+                m_text.text = value.ToString();
+            }
+            else
+            {
+                Debug.LogError("UI_TextUpdate: No Text component found!");
+            }
+        }
+
+        private void OnDestroy()
+        {
+            switch (source)
+            {
+                case UpdateSource.PlayerLifes:
+                    TDPlayer.LivesUpdateUnsubscribe(UpdateText);
+                    break;
+                case UpdateSource.PlayerMoney:
+                    TDPlayer.GoldUpdateUnsubscribe(UpdateText);
+                    break;
+            }
         }
     }
 }

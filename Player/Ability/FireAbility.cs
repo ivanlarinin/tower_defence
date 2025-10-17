@@ -6,7 +6,7 @@ namespace TowerDefence
     [CreateAssetMenu(menuName = "Abilities/FireAbility")]
     public class FireAbility : Ability
     {
-        [SerializeField] private int cost = 5;
+        [SerializeField] private int cost = 10;
         [SerializeField] private int damage = 2;
         [SerializeField] private float radius = 2f;
 

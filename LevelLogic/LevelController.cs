@@ -2,11 +2,11 @@ using UnityEngine;
 
 namespace TowerDefence
 {
+    /// <summary>
+    /// Controls level flow, including win/loss conditions and score calculation.
+    /// </summary>
     public class LevelController : SingletonBase<LevelController>
     {
-        [Header("UI Panels")]
-        [SerializeField] private GameObject m_PanelSuccess;
-        [SerializeField] private GameObject m_PanelFailure;
 
         [Header("Score Settings")]
         [SerializeField] private float maxTimeForFullScore = 40f;
@@ -15,13 +15,17 @@ namespace TowerDefence
         private bool m_IsLevelCompleted;
         private float m_LevelTime;
 
-        public float LevelTime => m_LevelTime;
+        [SerializeField] private GameObject hudPrefab;
+        private LevelResult resultPanel;
 
         private void Start()
         {
             TDPlayer.Instance.PlayerDied += Lose;
-        
-            var wavesManager = FindObjectsByType<EnemyWavesManager>(FindObjectsSortMode.None)[0];
+
+            var hudGO = Instantiate(hudPrefab);
+            resultPanel = hudGO.GetComponentInChildren<LevelResult>();
+
+            var wavesManager = FindFirstObjectByType<EnemyWavesManager>();
             if (wavesManager != null)
                 wavesManager.OnAllWavesCompleted += OnLevelCompleted;
         }
@@ -41,17 +45,17 @@ namespace TowerDefence
 
             m_IsLevelCompleted = true;
             StopLevelActivity();
+            resultPanel.ShowResult(true);
 
             var currentEpisode = LevelSequenceController.Instance.CurrentEpisode;
             MapCompletion.SaveEpisodeResult(currentEpisode, LevelScore);
 
-            Show(true);
         }
 
         private void Lose()
         {
             StopLevelActivity();
-            Show(false);
+            resultPanel.ShowResult(false);
         }
 
         private void StopLevelActivity()
@@ -70,16 +74,10 @@ namespace TowerDefence
             DisableAll<CallNextWave>();
         }
 
-        private void Show(bool success)
-        {
-            m_PanelSuccess?.SetActive(success);
-            m_PanelFailure?.SetActive(!success);
-        }
-
         public void OnPlayNext()
         {
             LevelSequenceController.Instance.AdvanceLevel();
-            m_PanelSuccess?.SetActive(false);
+            resultPanel.HideAll();
         }
         public void OnRestartLevel() => LevelSequenceController.Instance.RestartLevel();
         public void OnExitToMenu() => LevelSequenceController.Instance.ExitToMenu();

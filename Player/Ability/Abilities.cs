@@ -16,7 +16,6 @@ namespace TowerDefence
 
         private void Start()
         {
-
             targetingInstance = Instantiate(targetingPrefab);
             targetingInstance.SetActive(false);
 

@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace TowerDefence
 {
@@ -19,13 +20,11 @@ namespace TowerDefence
             if (manager != null)
             {
                 manager.CallNextWave();
+                if (manager.IsLastWaveCompleted())
+                {
+                    GetComponent<Button>().interactable = false;
+                }
             }
-        }
-
-        // Update is called once per frame
-        void Update()
-        {
-
         }
     }
 }

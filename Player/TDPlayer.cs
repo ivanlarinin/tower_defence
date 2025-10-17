@@ -92,6 +92,16 @@ namespace TowerDefence
             Destroy(buildSite.gameObject);
         }
 
+        internal static void LivesUpdateUnsubscribe(Action<int> act)
+        {
+            OnLivesChanged -= act;
+        }
+
+        internal static void GoldUpdateUnsubscribe(Action<int> act)
+        {
+            OnGoldChanged -= act;
+        }
+
         #endregion
     }
 }
