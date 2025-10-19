@@ -19,16 +19,27 @@ namespace TowerDefence
             targetingInstance = Instantiate(targetingPrefab);
             targetingInstance.SetActive(false);
 
+            // initial setup and UI state
+            fireButton.onClick.AddListener(() => fireAbility.TryUse());
+            timeButton.onClick.AddListener(() => timeAbility.TryUse());
+
+            // Clear any persisted cooldown flags on the ScriptableObject assets
+            fireAbility?.ResetCooldownState();
+            timeAbility?.ResetCooldownState();
+
+            RefreshButtons();
+        }
+
+        // RefreshButtons updates interactability based on upgrade ownership and cooldown state.
+        public void RefreshButtons()
+        {
             int fireLevel = Upgrades.GetUpgradeLevel(UpgradeAsset.UpgradeType.FireAbility);
             bool hasFire = fireLevel > 0;
-            fireButton.interactable = hasFire;
+            fireButton.interactable = hasFire && fireAbility != null && !fireAbility.IsOnCooldown;
 
             int timeLevel = Upgrades.GetUpgradeLevel(UpgradeAsset.UpgradeType.TimeAbility);
             bool hasTime = timeLevel > 0;
-            timeButton.interactable = hasTime;
-
-            fireButton.onClick.AddListener(() => fireAbility.TryUse());
-            timeButton.onClick.AddListener(() => timeAbility.TryUse());
+            timeButton.interactable = hasTime && timeAbility != null && !timeAbility.IsOnCooldown;
         }
 
         public IEnumerator FireTargetingRoutine(FireAbility ability)

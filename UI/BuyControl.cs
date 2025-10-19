@@ -3,6 +3,9 @@ using UnityEngine;
 
 namespace TowerDefence
 {
+    /// <summary>
+    ///  Control for buying towers, appears when clicking on a build site
+    /// </summary>
     public class BuyControl : MonoBehaviour
     {
         [SerializeField] private TowerBuyControl m_TowerBuyPrefab;
@@ -75,6 +78,11 @@ namespace TowerDefence
                 m_ActiveControl.Clear();
                 gameObject.SetActive(false);
             }
+        }
+
+        private void OnDestroy()
+        {
+            BuildSite.OnClickEvent -= MoveToBuildSite;
         }
     }
 }

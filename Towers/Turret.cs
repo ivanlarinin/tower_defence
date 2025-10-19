@@ -60,7 +60,6 @@ namespace TowerDefence
                 damageBonus = damageUpgradeLevel;
             }
             projectile.Damage += damageBonus;
-            // Debug.Log($"Damage bonus value: {damageBonus}");
 
             m_RefireTimer = m_TurretProperties.RateOfFire;
         }

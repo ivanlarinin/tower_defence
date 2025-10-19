@@ -20,7 +20,17 @@ namespace TowerDefence
         private IEnumerator CooldownRoutine()
         {
             IsOnCooldown = true;
+            Abilities.Instance?.RefreshButtons();
+
             yield return new WaitForSeconds(Cooldown);
+
+            IsOnCooldown = false;
+            Abilities.Instance?.RefreshButtons();
+        }
+
+        // Reset runtime cooldown state (ScriptableObjects persist between scene loads)
+        public void ResetCooldownState()
+        {
             IsOnCooldown = false;
         }
     }

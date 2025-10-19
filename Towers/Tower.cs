@@ -39,7 +39,6 @@ namespace TowerDefence
 
             if (m_Target != null)
             {
-                // Calculate the predicted position of the target
                 Rigidbody2D targetRigidbody = m_Target.GetComponent<Rigidbody2D>();
                 Vector2 targetPosition = m_Target.transform.position;
 
@@ -47,7 +46,7 @@ namespace TowerDefence
                 {
                     Vector2 targetVelocity = targetRigidbody.linearVelocity;
                     float projectileSpeed = m_Turrets[0].ProjectileSpeed;
-                    float timeToTarget = Vector2.Distance(transform.position, targetPosition) / projectileSpeed;
+                    float timeToTarget = Vector2.Distance(transform.position, targetPosition) / (projectileSpeed * 1.1f);
 
                     // Predict the target's future position
                     targetPosition += targetVelocity * timeToTarget;
