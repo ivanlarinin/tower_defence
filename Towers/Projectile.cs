@@ -15,6 +15,8 @@ namespace TowerDefence
     {
         [SerializeField] private ImpactEffect m_ImpactEffectPrefab;
         [SerializeField] private DamageType m_DamageType;
+        
+        [SerializeField] private Sound m_HitSound;
 
         public DamageType Type
         {
@@ -23,11 +25,20 @@ namespace TowerDefence
         }
 
         /// <summary>
+        /// Convenience setter to change projectile damage type at runtime.
+        /// </summary>
+        public void SetType(DamageType type)
+        {
+            m_DamageType = type;
+        }
+
+        /// <summary>
         /// Called when the projectile hits an enemy.
         /// </summary>
         /// <param name="destructible"></param>
         protected override void OnHit(Enemy destructible)
         {
+            m_HitSound.Play();
             destructible?.TakeDamage(Damage, m_DamageType);
         }
 

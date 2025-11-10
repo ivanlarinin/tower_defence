@@ -5,7 +5,7 @@ using System;
 namespace TowerDefence
 {
     /// <summary>
-    /// Represents a build site in the UI. Holds a list of towers that can be built here and
+    /// Holds a list of towers that can be built here and
     /// raises click events for UI handling.
     /// </summary>
     public class BuildSite : MonoBehaviour, IPointerDownHandler

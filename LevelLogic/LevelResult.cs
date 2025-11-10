@@ -17,6 +17,10 @@ namespace TowerDefence
         [SerializeField] private Sprite winSprite;
         [SerializeField] private Sprite loseSprite;
 
+        [Header("Sound Effects")]
+        [SerializeField] private Sound m_WinSound;
+        [SerializeField] private Sound m_LoseSound;
+
         private void Awake()
         {
             // Safety checks
@@ -43,6 +47,15 @@ namespace TowerDefence
             resultPanel.SetActive(true);
 
             resultImage.sprite = result ? winSprite : loseSprite;
+
+            if (result)
+            {
+                m_WinSound.Play();
+            }
+            else
+            {
+                m_LoseSound.Play();
+            }
         }
 
         /// <summary>

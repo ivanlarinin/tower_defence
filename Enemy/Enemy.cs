@@ -1,5 +1,7 @@
 using System;
+#if UNITY_EDITOR
 using UnityEditor;
+#endif
 using UnityEngine;
 
 namespace TowerDefence
@@ -16,6 +18,12 @@ namespace TowerDefence
         #region Fields and Properties
 
         [SerializeField] private SpriteRenderer m_SpriteRenderer;
+
+        protected override SpriteRenderer GetSpriteRenderer()
+        {
+            return m_SpriteRenderer;
+        }
+
         [SerializeField] private Animator m_Animator;
         [SerializeField] private CircleCollider2D m_CircleCollider;
         [SerializeField] private Transform m_Scale;
@@ -36,27 +44,15 @@ namespace TowerDefence
 
         public enum ArmorType { Base = 0, Mage = 1 }
 
-        private static Func<int, DamageType, int, int>[] ArmorDamageFunctions =
+        private static readonly Func<int, DamageType, int, int>[] ArmorDamageFunctions =
         {
-            // Base armor
-            (power, type, armor) =>
-            {
-                switch(type)
-                {
-                    case DamageType.Magic: return power;
-                    default: return Mathf.Max(power - armor, 1);
-                }
-            },
+            // Base armor reduces Physical damage only
+            (damage, damageType, armor) =>
+                    damageType == DamageType.Physical ? Math.Max(0, damage - armor) : damage,
 
-            // Mage armor
-            (power, type, armor) =>
-            {
-                switch(type)
-                {
-                    case DamageType.Magic: return Mathf.Max(power - armor, 1);
-                    default: return power;
-                }
-            }
+            // Magic armor reduces ALL damage types
+            (damage, damageType, armor) =>
+                Math.Max(0, damage - armor)
         };
 
         private Destructable m_Destructable;
@@ -64,8 +60,6 @@ namespace TowerDefence
         #endregion
 
         #region Unity Methods
-
-
 
         /// <summary>
         /// Caches references to required components.
@@ -184,6 +178,7 @@ namespace TowerDefence
             m_Gold = asset.gold;
             m_Buff = asset.buff;
             m_Armor = asset.armor;
+            m_ArmorType = asset.armorType;
         }
 
         /// <summary>
@@ -216,6 +211,7 @@ namespace TowerDefence
             if (m_Destructable != null)
             {
                 int finalDamage = ArmorDamageFunctions[(int)m_ArmorType](damage, damageType, m_Armor);
+                m_Armor -= damage;
                 m_Destructable.ApplyDamage(finalDamage, damageType);
             }
         }
@@ -223,6 +219,7 @@ namespace TowerDefence
         #endregion
     }
 
+#if UNITY_EDITOR
     /// <summary>
     /// Custom inspector for the Enemy class, allowing quick application of EnemyAsset configurations.
     /// </summary>
@@ -240,4 +237,5 @@ namespace TowerDefence
             }
         }
     }
+#endif
 }

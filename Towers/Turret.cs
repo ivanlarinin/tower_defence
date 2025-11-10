@@ -46,12 +46,14 @@ namespace TowerDefence
             if (m_TurretProperties == null) return;
             if (m_RefireTimer > 0) return;
 
-            ProjectileBase projectile = Instantiate(m_TurretProperties.ProjectilePrefab).GetComponent<ProjectileBase>();
+            Projectile projectile = Instantiate(m_TurretProperties.ProjectilePrefab);
             projectile.GetComponentInChildren<SpriteRenderer>().sprite = m_TurretProperties.ProjectileSprite;
             projectile.transform.position = transform.position;
             projectile.transform.up = transform.up;
 
             projectile.SetVelocity(ProjectileSpeed);
+            projectile.SetType(m_TurretProperties.DamageType);
+            projectile.Damage = m_TurretProperties.Damage;
 
             int damageBonus = 0;
             if (Upgrades.Instance != null)
@@ -62,6 +64,8 @@ namespace TowerDefence
             projectile.Damage += damageBonus;
 
             m_RefireTimer = m_TurretProperties.RateOfFire;
+
+            Sound.Arrow.Play();
         }
 
         /// <summary>

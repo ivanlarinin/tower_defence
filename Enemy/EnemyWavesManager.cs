@@ -18,6 +18,9 @@ namespace TowerDefence
         private WaveConfig waveConfig;
         private int currentWaveIndex = 0;
         private int activeEnemyCount = 0;
+
+        public Action<int> OnWaveNumberChanged { get; private set; }
+
         private void RecordEnemyDeath()
         {
             activeEnemyCount--;
@@ -40,20 +43,19 @@ namespace TowerDefence
         private void LoadWaveJson()
         {
             string sceneName = SceneManager.GetActiveScene().name;
-            string fileName = $"{sceneName}_waves.json";
-            string path = Path.Combine(Application.dataPath, fileName);
-            if (File.Exists(path))
+            TextAsset jsonFile = Resources.Load<TextAsset>($"{sceneName}_waves");
+            if (jsonFile != null)
             {
-                string json = File.ReadAllText(path);
-                waveConfig = JsonUtility.FromJson<WaveConfig>(json);
-                Debug.Log("Loaded waves.json");
+                waveConfig = JsonUtility.FromJson<WaveConfig>(jsonFile.text);
+                Debug.Log("Loaded waves.json from Resources");
             }
             else
             {
-                Debug.LogError("waves.json not found!");
+                Debug.LogError("waves.json not found in Resources!");
                 waveConfig = new WaveConfig();
             }
         }
+
 
         private void StartWave(int waveIndex)
         {
@@ -68,6 +70,7 @@ namespace TowerDefence
             if (waveConfig.waves.Count <= currentWaveIndex) return;
 
             WaveData wave = waveConfig.waves[currentWaveIndex];
+            OnWaveNumberChanged?.Invoke(currentWaveIndex + 1);
 
             for (int g = 0; g < wave.groups.Count; g++)
             {
@@ -109,6 +112,25 @@ namespace TowerDefence
             {
                 CancelInvoke(nameof(SpawnWave));
                 SpawnWave();
+            }
+        }
+
+        internal static void WaveNumberUpdateSubscribe(Action<int> updateText)
+        {
+            EnemyWavesManager instance = FindFirstObjectByType<EnemyWavesManager>();
+            if (instance != null)
+            {
+                instance.OnWaveNumberChanged += updateText;
+                updateText(instance.currentWaveIndex);
+            }
+        }
+
+        internal static void WaveNumberUpdateUnsubscribe(Action<int> updateText)
+        {
+            EnemyWavesManager instance = FindFirstObjectByType<EnemyWavesManager>();
+            if (instance != null)
+            {
+                instance.OnWaveNumberChanged -= updateText;
             }
         }
     }

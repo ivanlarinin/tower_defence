@@ -33,6 +33,9 @@ namespace TowerDefence
         [Header("Explosion")]
         [SerializeField] private GameObject m_ExplosionPrefab;
 
+        [Header("Sound")]
+        [SerializeField] private Sound m_DestructionSound;
+
         #endregion
 
         #region Unity Events
@@ -53,7 +56,7 @@ namespace TowerDefence
 
             m_CurrentHitPoints -= damage;
 
-            if (m_CurrentHitPoints <= 0)
+            if (m_CurrentHitPoints <= 0) 
                 OnDeath();
         }
 
@@ -83,14 +86,50 @@ namespace TowerDefence
                 m_CurrentHitPoints = m_HitPoints;
         }
 
+        [SerializeField] private SpriteRenderer m_SpriteRenderer;
+
+        protected virtual SpriteRenderer GetSpriteRenderer()
+        {
+            return GetComponentInChildren<SpriteRenderer>();
+        }
+
+        [SerializeField] private float m_BlinkDuration = 0.5f;
+        [SerializeField] private float m_BlinkInterval = 0.1f;
+        [SerializeField] private bool m_BlinkOnDeath = true;
+
+
         /// <summary>
         /// Called when hit points reach zero, triggering death logic.
         /// </summary>
         protected virtual void OnDeath()
         {
+            m_DestructionSound.Play();
             DeathEvent?.Invoke();
+
+            var renderer = GetSpriteRenderer();
+            if (renderer != null)
+                StartCoroutine(BlinkAndDestroy(renderer));
+            else
+                Destroy(gameObject);
+        }
+
+        private System.Collections.IEnumerator BlinkAndDestroy(SpriteRenderer renderer)
+        {
+            float elapsed = 0f;
+            bool visible = true;
+
+            while (elapsed < m_BlinkDuration)
+            {
+                visible = !visible;
+                m_SpriteRenderer.enabled = visible;
+                yield return new WaitForSeconds(m_BlinkInterval);
+                elapsed += m_BlinkInterval;
+            }
+
+            m_SpriteRenderer.enabled = true;
             Destroy(gameObject);
         }
+
 
 
         [SerializeField] private int m_ScoreValue;

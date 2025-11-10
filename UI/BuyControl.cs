@@ -10,7 +10,7 @@ namespace TowerDefence
     {
         [SerializeField] private TowerBuyControl m_TowerBuyPrefab;
         [SerializeField] private float m_Radius = 80f;
-        [SerializeField] private float m_StartAngle = 90f;
+        [SerializeField] private float m_StartAngle = 10f;
         private List<TowerBuyControl> m_ActiveControl;
         private RectTransform t;
         private void Awake()
@@ -48,7 +48,7 @@ namespace TowerDefence
                     }
                 }
 
-                // arrange in circle
+                // Arrange in circle
                 int count = m_ActiveControl.Count;
                 if (count > 0)
                 {

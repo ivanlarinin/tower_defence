@@ -2,9 +2,13 @@ using UnityEngine;
 
 namespace TowerDefence
 {
+    /// <summary>
+    /// Class representing a tower in the tower defense game.
+    /// </summary>
     public class Tower : MonoBehaviour
     {
         [SerializeField] private float m_Radius;
+        [SerializeField] private float m_OriginUpOffset = 0.56f;
         public float Radius => m_Radius;
 
         private Turret[] m_Turrets;
@@ -30,7 +34,8 @@ namespace TowerDefence
         {
             if (m_Turrets != null)
             {
-                var enter = Physics2D.OverlapCircle(transform.position, m_Radius);
+                Vector2 towerOrigin = (Vector2)transform.position + (Vector2)transform.up * m_OriginUpOffset;
+                var enter = Physics2D.OverlapCircle(towerOrigin, m_Radius);
                 if (enter != null)
                 {
                     m_Target = enter.transform.root.GetComponent<Destructable>();
@@ -42,26 +47,29 @@ namespace TowerDefence
                 Rigidbody2D targetRigidbody = m_Target.GetComponent<Rigidbody2D>();
                 Vector2 targetPosition = m_Target.transform.position;
 
-                if (targetRigidbody != null)
+                if (targetRigidbody != null && m_Turrets != null && m_Turrets.Length > 0)
                 {
                     Vector2 targetVelocity = targetRigidbody.linearVelocity;
                     float projectileSpeed = m_Turrets[0].ProjectileSpeed;
-                    float timeToTarget = Vector2.Distance(transform.position, targetPosition) / (projectileSpeed * 1.1f);
+                    Vector2 towerOrigin = (Vector2)transform.position + (Vector2)transform.up * m_OriginUpOffset;
+                    float timeToTarget = Vector2.Distance(towerOrigin, targetPosition) / projectileSpeed;
 
-                    // Predict the target's future position
                     targetPosition += targetVelocity * timeToTarget;
                 }
 
-                Vector2 targetVector = targetPosition - (Vector2)transform.position;
+                Vector2 targetVector = targetPosition - ((Vector2)transform.position + (Vector2)transform.up * m_OriginUpOffset);
                 float active_dist = targetVector.magnitude;
 
                 if (active_dist <= m_Radius)
                 {
                     foreach (var turret in m_Turrets)
                     {
-                        turret.transform.up = targetVector.normalized;
+                        Vector2 turretAim = targetPosition - (Vector2)turret.transform.position;
+                        turret.transform.up = turretAim.normalized;
                         turret.Fire();
-                        Debug.DrawLine(turret.transform.position, targetPosition, Color.red);
+                        #if UNITY_EDITOR
+                        Debug.DrawLine(turret.transform.position, targetPosition, Color.green);
+                        #endif
                     }
                 }
             }

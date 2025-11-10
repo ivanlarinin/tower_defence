@@ -26,6 +26,8 @@ namespace TowerDefence
 
         [SerializeField] private float m_RateOfFire;
         public float RateOfFire => m_RateOfFire;
+        [SerializeField] private int m_Damage;
+        public int Damage => m_Damage;
 
         public UpgradeAsset DamageUpgradeAsset;
 
@@ -34,6 +36,9 @@ namespace TowerDefence
 
         [SerializeField] private AudioClip m_LaunchSFX;
         public AudioClip LaunchSFX => m_LaunchSFX;
+
+        [SerializeField] private DamageType m_DamageType;
+        public DamageType DamageType => m_DamageType;
 
         
     }

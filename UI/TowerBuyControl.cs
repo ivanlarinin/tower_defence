@@ -1,4 +1,3 @@
-using TowerDefence;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -34,9 +33,13 @@ namespace TowerDefence
 
         public void BuyTower()
         {
-            print(m_towerAsset.GUIsprite);
             TDPlayer.Instance.TryBuild(m_towerAsset, buildSite);
             BuildSite.HideControls();
+        }
+
+        private void OnDestroy()
+        {
+            TDPlayer.GoldUpdateUnsubscribe(GoldStatusCheck);
         }
     }
 }

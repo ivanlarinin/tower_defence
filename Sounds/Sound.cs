@@ -11,7 +11,10 @@ namespace TowerDefence
         Arrow,
         ArrowHit,
         EnemyDeath,
-        TowerBuilt
+        TowerBuilt,
+        EnemyBreakthrough,
+        Win,
+        Lose
     }
 
     /// <summary>
