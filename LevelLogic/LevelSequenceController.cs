@@ -1,4 +1,5 @@
-﻿using UnityEngine.SceneManagement;
+﻿using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace TowerDefence
 {
@@ -20,9 +21,6 @@ namespace TowerDefence
         {
             CurrentEpisode = e;
             CurrentLevel = 0;
-
-            // сбрасываем статы перед началом эпизода.
-            // LevelResultController.ResetPlayerStats();
 
             SceneManager.LoadScene(e.Levels[CurrentLevel]);
         }
