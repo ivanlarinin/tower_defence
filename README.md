@@ -107,27 +107,6 @@ Assets/
 
 ---
 
-## ⚙️ Setup Instructions
-
-1. **Open in Unity**
-
-   * Unity version: `2022.3 LTS` or later recommended.
-   * Import the `Scripts` folder into your Unity project.
-
-2. **Create Required Assets**
-
-   * `EnemyAsset` – defines enemy stats and visuals.
-   * `TowerAssets` – defines tower cost, sprites, and turret properties.
-   * `TurretProperties` – projectile type, damage, rate of fire, etc.
-   * `UpgradeAsset` – defines upgrade type and cost per level.
-   * `Episode` – defines levels per episode (for campaign progression).
-
-3. **Scene Setup**
-
-   * Add `LevelSequenceController` to your persistent scene.
-   * Add `SoundPlayer` prefab with assigned clips.
-   * Include UI prefabs: MainMenu, HUD (with `UI_TextUpdate`), UpgradeShop, etc.
-
 4. **Wave Data**
 
    * Create JSON in `Resources/<SceneName>_waves.json`:
