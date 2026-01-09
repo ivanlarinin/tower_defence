@@ -128,12 +128,6 @@ Assets/
        ]
      }
      ```
-
-5. **Play**
-
-   * Start from `LevelMap` or `MainMenu` scene.
-   * Build towers, defeat waves, earn stars, and unlock upgrades.
-
 ---
 
 ## 🧠 Extending the Game
